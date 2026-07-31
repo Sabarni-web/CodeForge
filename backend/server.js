@@ -25,4 +25,4 @@ startServer().catch((error) => {
   process.exit(1);
 });
 
-// Triggering nodemon restart to pick up .env file
+// Triggering nodemon restart to pick up MongoDB Atlas URI

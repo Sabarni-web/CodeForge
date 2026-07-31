@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 const AIGeneratorPage = () => {
   const [prompt, setPrompt] = useState('');
+  const [viewMode, setViewMode] = useState('preview');
   const dispatch = useDispatch();
   const { generatedHtml, generating, error } = useSelector((state) => state.ai);
 
@@ -120,16 +121,37 @@ const AIGeneratorPage = () => {
             </div>
             
             {generatedHtml && (
+              <div className="flex gap-2 bg-dark-900 rounded-lg p-1 border border-dark-700">
+                <button
+                  onClick={() => setViewMode('preview')}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    viewMode === 'preview' ? 'bg-dark-700 text-white' : 'text-dark-400 hover:text-white'
+                  }`}
+                >
+                  Preview
+                </button>
+                <button
+                  onClick={() => setViewMode('code')}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    viewMode === 'code' ? 'bg-dark-700 text-white' : 'text-dark-400 hover:text-white'
+                  }`}
+                >
+                  Code
+                </button>
+              </div>
+            )}
+            
+            {generatedHtml && (
               <button 
                 onClick={handleDownload}
-                className="text-dark-300 hover:text-white flex items-center gap-1.5 text-xs bg-dark-800 hover:bg-dark-700 px-3 py-1.5 rounded transition-colors"
+                className="text-dark-300 hover:text-white flex items-center gap-1.5 text-xs bg-dark-800 hover:bg-dark-700 px-3 py-1.5 rounded transition-colors ml-4"
               >
                 <FiDownload /> Download HTML
               </button>
             )}
           </div>
           
-          <div className="flex-1 relative bg-dark-800">
+          <div className="flex-1 relative bg-dark-800 overflow-hidden">
             {generating ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-dark-900/80 backdrop-blur-sm z-10">
                 <div className="w-16 h-16 border-4 border-dark-700 border-t-brand-500 rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
@@ -138,7 +160,15 @@ const AIGeneratorPage = () => {
               </div>
             ) : null}
             
-            <GeneratedSitePreview html={generatedHtml} />
+            <div className="absolute inset-0 p-4 overflow-auto">
+              {viewMode === 'preview' ? (
+                <GeneratedSitePreview html={generatedHtml} />
+              ) : (
+                <pre className="text-sm font-mono text-dark-300 bg-dark-900 p-4 rounded-lg overflow-auto h-full whitespace-pre-wrap selection:bg-brand-500/30">
+                  <code>{generatedHtml || 'No code generated yet.'}</code>
+                </pre>
+              )}
+            </div>
           </div>
         </div>
       </div>

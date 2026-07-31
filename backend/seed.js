@@ -5,18 +5,39 @@ dotenv.config();
 mongoose.connect('mongodb://127.0.0.1:27017/codeforge').then(async () => {
   const User = (await import('./src/models/User.js')).default;
   
-  const testUser = await User.findOne({ username: 'SabarniABC' });
-  if (!testUser) {
-    await User.create({
-      username: 'SabarniABC',
-      email: 'sabarni@example.com',
+  const newUsers = [
+    {
+      username: 'Sabarni345',
+      email: 'sabarni345@example.com',
       password: 'password123',
-      displayName: 'Sabarni',
-      bio: 'I am a test user created to test the search feature!'
-    });
-    console.log('Created test user SabarniABC');
-  } else {
-    console.log('User SabarniABC already exists');
+      displayName: 'Sabarni 345',
+      bio: 'Another test user!'
+    },
+    {
+      username: 'JohnDoe',
+      email: 'john@example.com',
+      password: 'password123',
+      displayName: 'John Doe',
+      bio: 'Full stack developer'
+    },
+    {
+      username: 'JaneSmith',
+      email: 'jane@example.com',
+      password: 'password123',
+      displayName: 'Jane Smith',
+      bio: 'UI/UX Designer'
+    }
+  ];
+
+  for (const userData of newUsers) {
+    const exists = await User.findOne({ username: userData.username });
+    if (!exists) {
+      await User.create(userData);
+      console.log(`Created test user ${userData.username}`);
+    } else {
+      console.log(`User ${userData.username} already exists`);
+    }
   }
+  
   mongoose.connection.close();
 });

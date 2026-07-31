@@ -1,7 +1,7 @@
-import { callNvidiaNIM } from '../config/nvidia.js';
+import { callGemini } from '../config/gemini.js';
 
 /**
- * Generate a complete HTML website using Nvidia NIM AI
+ * Generate a complete HTML website using Google Gemini AI
  * @param {string} prompt - User's description of the website they want
  * @returns {Promise<{ html: string, title: string }>}
  */
@@ -16,30 +16,38 @@ RULES:
 5. Include a proper <!DOCTYPE html> declaration.
 6. Do NOT wrap the HTML in markdown code blocks. Return ONLY the raw HTML.
 7. Do NOT include any explanations, comments outside the code, or markdown formatting.
-8. Use vibrant colors, smooth animations, and modern typography.
-9. The page should be fully functional and interactive where applicable.`;
+9. The page should be fully functional and interactive where applicable.
+10. CRITICAL: Keep your CSS extremely concise. Do not write thousands of lines of CSS. Use utility classes or simple rules. You MUST finish writing the entire HTML body before you run out of tokens.`;
 
-  const result = await callNvidiaNIM({
-    model: 'meta/llama-3.3-70b-instruct',
-    messages: [
-      {
-        role: 'system',
-        content: systemInstruction
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ],
-    temperature: 0.7,
-    max_tokens: 4096
-  });
+  // Forcefully truncate the prompt if the user pastes too much text
+  // This guarantees the AI won't try to build a massive app and hit the output token limit!
+  const safePrompt = prompt.length > 400 ? prompt.substring(0, 400) + '...' : prompt;
 
-  let html = result.choices[0].message.content;
+  const result = await callGemini(safePrompt, systemInstruction);
+
+  let html = result.candidates[0].content.parts[0].text;
 
   // Clean up: remove markdown code blocks if wraps them
   html = html.replace(/^```html?\s*/i, '').replace(/\s*```$/i, '');
   html = html.trim();
+
+  // Safeguard: If the AI hit its output token limit and got truncated in the middle of the CSS
+  // (which happens if the user gives a massive prompt), it will never close the <style> tag.
+  // This causes the browser to render a completely blank white page. 
+  // We will forcibly close the tags so the user at least sees an error message on the screen!
+  if (!html.includes('</html>')) {
+    html += `
+      </style>
+    </head>
+    <body style="display:flex; justify-content:center; align-items:center; height:100vh; background:#111; color:#ff4444; font-family:sans-serif; text-align:center; padding:2rem;">
+      <div>
+        <h1 style="font-size:2rem; margin-bottom:1rem;">⚠️ Code Generation Incomplete</h1>
+        <p style="color:#ccc; line-height:1.5;">Your prompt was too large and the AI ran out of space while writing the CSS styling!<br/>Because of this, it was unable to finish writing the actual HTML body elements.</p>
+        <p style="color:#fff; margin-top:1.5rem; font-weight:bold;">Please try again with a shorter, single-page prompt!</p>
+      </div>
+    </body>
+    </html>`;
+  }
 
   // Extract a title from the HTML
   const titleMatch = html.match(/<title>(.*?)<\/title>/i);
