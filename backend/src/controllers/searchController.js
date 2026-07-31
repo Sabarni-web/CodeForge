@@ -1,16 +1,18 @@
 import User from '../models/User.js';
 import Repository from '../models/Repository.js';
+import FollowRequest from '../models/FollowRequest.js';
 
 export const searchUsers = async (req, res, next) => {
   try {
     const { q = '', page = 1, limit = 10 } = req.query;
     
-    // Partial and case-insensitive regex query
+    // Partial, case-insensitive, and lenient regex query (allows spaces/underscores to match)
     const query = {};
     if (q) {
+      const lenientQ = q.trim().replace(/[\s_]+/g, '.*');
       query.$or = [
-        { username: { $regex: q, $options: 'i' } },
-        { displayName: { $regex: q, $options: 'i' } },
+        { username: { $regex: lenientQ, $options: 'i' } },
+        { displayName: { $regex: lenientQ, $options: 'i' } },
       ];
     }
 
@@ -34,8 +36,6 @@ export const searchUsers = async (req, res, next) => {
           const isFollowing = req.user.following?.some(id => id.toString() === u._id.toString()) || false;
           
           // Check for pending/rejected requests
-          const mongoose = (await import('mongoose')).default;
-          const FollowRequest = mongoose.model('FollowRequest');
           const request = await FollowRequest.findOne({
             sender: req.user._id,
             receiver: u._id,
