@@ -47,8 +47,22 @@ const ProfilePage = () => {
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, avatar: reader.result });
+      reader.onloadend = async () => {
+        const base64Avatar = reader.result;
+        setFormData({ ...formData, avatar: base64Avatar });
+        
+        if (!isEditing) {
+          setSaving(true);
+          try {
+            await updateProfileAPI({ ...formData, avatar: base64Avatar });
+            await dispatch(fetchMe()).unwrap();
+            toast.success('Profile photo updated successfully');
+          } catch (error) {
+            toast.error('Failed to update profile photo');
+          } finally {
+            setSaving(false);
+          }
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -71,8 +85,8 @@ const ProfilePage = () => {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/3 flex flex-col items-center">
           <div 
-            className={`w-48 h-48 rounded-full bg-dark-800 border-4 border-dark-700 overflow-hidden flex items-center justify-center shadow-xl mb-4 relative group ${isEditing ? 'cursor-pointer' : ''}`}
-            onClick={() => isEditing && fileInputRef.current?.click()}
+            className={`w-48 h-48 rounded-full bg-dark-800 border-4 border-dark-700 overflow-hidden flex items-center justify-center shadow-xl mb-4 relative group cursor-pointer`}
+            onClick={() => fileInputRef.current?.click()}
           >
             {formData.avatar ? (
               <img src={formData.avatar} alt={user.username} className="w-full h-full object-cover" />
@@ -81,11 +95,9 @@ const ProfilePage = () => {
                 {user.username?.charAt(0).toUpperCase()}
               </span>
             )}
-            {isEditing && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-sm font-medium text-white">Upload Photo</span>
-              </div>
-            )}
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-sm font-medium text-white">Upload Photo</span>
+            </div>
           </div>
           <input 
             type="file" 

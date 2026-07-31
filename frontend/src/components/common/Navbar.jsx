@@ -2,8 +2,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../../features/auth/authThunks';
 import { toggleTheme } from '../../features/ui/uiSlice';
+import { acceptFollowRequest, rejectFollowRequest } from '../../features/follow/followSlice';
+import { markNotificationRead } from '../../features/notifications/notificationSlice';
 import { FiCode, FiCpu, FiPlus, FiSun, FiMoon, FiUser, FiLogOut, FiGlobe, FiBell, FiUsers, FiSettings, FiSearch } from 'react-icons/fi';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import './Navbar.css';
 
 const NAV_ITEMS = [
@@ -20,13 +23,15 @@ const Navbar = () => {
   const location = useLocation();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { theme } = useSelector((state) => state.ui);
-  const { unreadCount } = useSelector((state) => state.notifications || { unreadCount: 0 });
+  const { notifications, unreadCount } = useSelector((state) => state.notifications || { notifications: [], unreadCount: 0 });
 
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
+  const notifDropdownRef = useRef(null);
   const linksRef = useRef(null);
 
   // Scroll listener for compact mode
@@ -42,6 +47,9 @@ const Navbar = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
       }
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target)) {
+        setNotifDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -51,6 +59,7 @@ const Navbar = () => {
   useEffect(() => {
     setMenuOpen(false);
     setDropdownOpen(false);
+    setNotifDropdownOpen(false);
   }, [location.pathname]);
 
   // Calculate indicator position
@@ -74,6 +83,32 @@ const Navbar = () => {
     setDropdownOpen(false);
     await dispatch(logoutUser());
     navigate('/login');
+  };
+
+  const getRequestId = (link) => {
+    if (!link) return null;
+    const match = link.match(/[?&]requestId=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  const handleAcceptFollow = async (requestId, notificationId) => {
+    try {
+      await dispatch(acceptFollowRequest(requestId)).unwrap();
+      toast.success('Follow request accepted');
+      await dispatch(markNotificationRead(notificationId)).unwrap();
+    } catch (err) {
+      toast.error(err || 'Failed to accept follow request');
+    }
+  };
+
+  const handleRejectFollow = async (requestId, notificationId) => {
+    try {
+      await dispatch(rejectFollowRequest(requestId)).unwrap();
+      toast.success('Follow request rejected');
+      await dispatch(markNotificationRead(notificationId)).unwrap();
+    } catch (err) {
+      toast.error(err || 'Failed to reject follow request');
+    }
   };
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
@@ -131,14 +166,56 @@ const Navbar = () => {
               </Link>
 
               {/* Notifications Icon with Badge */}
-              <Link to="/notifications" className="relative p-2 text-dark-300 hover:text-white transition-colors mr-2" aria-label="Notifications">
-                <FiBell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-red-550 text-[10px] font-bold text-white rounded-full flex items-center justify-center animate-pulse">
-                    {unreadCount}
-                  </span>
+              <div className="relative cf-notif-wrap" ref={notifDropdownRef}>
+                <button 
+                  onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                  className="relative p-2 text-dark-300 hover:text-white transition-colors mr-2" 
+                  aria-label="Notifications"
+                >
+                  <FiBell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-red-550 text-[10px] font-bold text-white rounded-full flex items-center justify-center animate-pulse">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+                
+                {notifDropdownOpen && (
+                  <div className="cf-notifications-dropdown">
+                    <div className="cf-notifications-header">
+                      <span className="font-semibold text-white">Notifications</span>
+                    </div>
+                    <div className="cf-notifications-body">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-sm text-dark-400">No new notifications</div>
+                      ) : (
+                        notifications.slice(0, 5).map(n => {
+                          const requestId = getRequestId(n.link);
+                          return (
+                            <div key={n._id} className={`cf-notif-item ${!n.isRead ? 'is-unread' : ''}`}>
+                              <div className="cf-notif-msg text-sm text-dark-300">
+                                <Link to={n.link} onClick={() => setNotifDropdownOpen(false)} className="text-dark-100 hover:text-brand-400 font-medium">
+                                  {n.sender?.displayName || n.sender?.username}
+                                </Link>{' '}
+                                {n.message.replace(`${n.sender?.username}`, '').replace(`${n.sender?.displayName}`, '').trim()}
+                              </div>
+                              {n.type === 'FOLLOW_REQUEST' && !n.isRead && requestId && (
+                                <div className="cf-notif-actions mt-2 flex gap-2">
+                                  <button onClick={() => handleAcceptFollow(requestId, n._id)} className="px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded text-xs transition-colors font-medium">Accept</button>
+                                  <button onClick={() => handleRejectFollow(requestId, n._id)} className="px-3 py-1.5 bg-dark-700 hover:bg-dark-600 text-dark-200 rounded text-xs transition-colors font-medium">Decline</button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                    <Link to="/notifications" onClick={() => setNotifDropdownOpen(false)} className="cf-notifications-footer hover:text-brand-400 text-sm text-center block w-full py-3 border-t border-dark-700 text-dark-200 transition-colors">
+                      View all notifications
+                    </Link>
+                  </div>
                 )}
-              </Link>
+              </div>
 
               {/* Avatar + dropdown */}
               <div className={`cf-avatar-wrap ${dropdownOpen ? 'is-open' : ''}`} ref={dropdownRef}>

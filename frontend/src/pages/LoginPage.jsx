@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../features/auth/authThunks';
 import { clearError } from '../features/auth/authSlice';
-import { FiMail, FiLock } from 'react-icons/fi';
+import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
@@ -66,14 +67,23 @@ const LoginPage = () => {
           <div className="cf-field__wrap">
             <FiLock className="cf-field__icon w-4 h-4" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               className="cf-field__input"
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
+              style={{ paddingRight: '40px' }}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{ position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cf-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+            </button>
           </div>
           {error && <div className="cf-field__error">{error}</div>}
         </div>

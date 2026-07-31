@@ -3,12 +3,14 @@ import { BrowserRouter } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { fetchMe } from './features/auth/authThunks';
+import { fetchNotifications } from './features/notifications/notificationSlice';
 import AppRoutes from './AppRoutes';
 import useSocket from './hooks/useSocket';
 
 function App() {
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.ui);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   // Initialize Socket.IO connection
   useSocket();
@@ -17,6 +19,13 @@ function App() {
     // Attempt to fetch current user session on load
     dispatch(fetchMe());
   }, [dispatch]);
+
+  // Fetch notifications once authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchNotifications());
+    }
+  }, [dispatch, isAuthenticated]);
 
   // Apply theme class to html element
   useEffect(() => {

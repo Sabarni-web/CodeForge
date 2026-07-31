@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfileSocial } from '../features/profile/profileSlice';
@@ -38,7 +38,10 @@ const PublicProfilePage = () => {
     coverImage: '',
     location: '',
     website: '',
+    website: '',
   });
+
+  const fileInputRef = useRef(null);
 
   const isOwnProfile = currentUser && currentUser.username === username;
 
@@ -98,6 +101,28 @@ const PublicProfilePage = () => {
     }
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Avatar = reader.result;
+        try {
+          await dispatch(updateProfileSocial({ avatar: base64Avatar })).unwrap();
+          toast.success('Profile photo updated successfully');
+          dispatch(fetchProfile(username));
+        } catch (error) {
+          toast.error('Failed to update profile photo');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (loading) return <Loader size="lg" text="Loading developer profile..." />;
   if (error) {
     return (
@@ -152,7 +177,10 @@ const PublicProfilePage = () => {
           {/* Left Column Profile info card */}
           <div className="w-full md:w-1/4">
             <div className="glass-card p-6 flex flex-col items-center md:items-start border border-dark-800 shadow-2xl">
-              <div className="w-36 h-36 md:w-44 md:h-44 rounded-full bg-dark-900 border-4 border-dark-850 overflow-hidden shadow-xl mb-4 relative">
+              <div 
+                className={`w-36 h-36 md:w-44 md:h-44 rounded-full bg-dark-900 border-4 border-dark-850 overflow-hidden shadow-xl mb-4 relative group ${isOwnProfile ? 'cursor-pointer' : ''}`}
+                onClick={() => isOwnProfile && fileInputRef.current?.click()}
+              >
                 {profile.avatar ? (
                   <img src={profile.avatar} alt={profile.username} className="w-full h-full object-cover" />
                 ) : (
@@ -160,7 +188,21 @@ const PublicProfilePage = () => {
                     {profile.username.charAt(0).toUpperCase()}
                   </div>
                 )}
+                {isOwnProfile && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-sm font-medium text-white text-center px-2">Upload Photo</span>
+                  </div>
+                )}
               </div>
+              {isOwnProfile && (
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={handleAvatarChange} 
+                />
+              )}
 
               <h2 className="text-2xl font-extrabold text-dark-50">{profile.displayName || profile.username}</h2>
               <p className="text-dark-400 text-sm">@{profile.username}</p>

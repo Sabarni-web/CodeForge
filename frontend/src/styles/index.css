@@ -14,6 +14,40 @@
     --cf-text-mid: #a599c4;
     --cf-text-dim: #6f6690;
     --cf-border: rgba(124, 58, 237, 0.22);
+    
+    --c-dark-50: 248 250 252;
+    --c-dark-100: 241 245 249;
+    --c-dark-200: 226 232 240;
+    --c-dark-300: 203 213 225;
+    --c-dark-400: 148 163 184;
+    --c-dark-500: 100 116 139;
+    --c-dark-600: 71 85 105;
+    --c-dark-700: 51 65 85;
+    --c-dark-800: 30 41 59;
+    --c-dark-900: 15 23 42;
+    --c-dark-950: 2 6 23;
+  }
+
+  .light {
+    --cf-void: #f8fafc;
+    --cf-deep: #f1f5f9;
+    --cf-panel: #ffffff;
+    --cf-text-hi: #0f172a;
+    --cf-text-mid: #334155;
+    --cf-text-dim: #64748b;
+    --cf-border: rgba(0, 0, 0, 0.1);
+
+    --c-dark-50: 2 6 23;
+    --c-dark-100: 15 23 42;
+    --c-dark-200: 30 41 59;
+    --c-dark-300: 51 65 85;
+    --c-dark-400: 71 85 105;
+    --c-dark-500: 100 116 139;
+    --c-dark-600: 148 163 184;
+    --c-dark-700: 203 213 225;
+    --c-dark-800: 241 245 249;
+    --c-dark-900: 255 255 255;
+    --c-dark-950: 248 250 252;
   }
 
   * {
@@ -251,7 +285,7 @@
   }
 
   .light .glass-card {
-    @apply bg-white/80 border-gray-200;
+    @apply bg-white/80 border-gray-200 shadow-sm;
   }
 
   .light .input-field {

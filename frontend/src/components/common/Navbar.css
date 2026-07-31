@@ -387,6 +387,77 @@
   margin: 6px 4px;
 }
 
+/* ---------- notifications dropdown ---------- */
+
+.cf-notifications-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -60px;
+  width: 340px;
+  background: var(--cf-panel);
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.6);
+  transform-origin: top right;
+  animation: cf-dropdown-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes cf-dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cf-notifications-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--cf-border);
+  font-size: 14px;
+}
+
+.cf-notifications-body {
+  max-height: 360px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.cf-notif-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.cf-notif-item:last-child {
+  border-bottom: none;
+}
+
+.cf-notif-item:hover {
+  background: rgba(124, 58, 237, 0.04);
+}
+
+.cf-notif-item.is-unread {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.cf-notif-item.is-unread:hover {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.cf-notif-msg {
+  line-height: 1.4;
+}
+
 /* ---------- mobile ---------- */
 
 .cf-navbar__burger {
