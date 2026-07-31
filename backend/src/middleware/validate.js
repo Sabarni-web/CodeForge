@@ -23,7 +23,7 @@ const validate = (validations) => {
 
     return res.status(400).json({
       success: false,
-      message: 'Validation failed',
+      message: extractedErrors.map(e => e.message).join(', ') || 'Validation failed',
       errors: extractedErrors,
     });
   };

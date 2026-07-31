@@ -24,3 +24,5 @@ startServer().catch((error) => {
   console.error('❌ Failed to start server:', error.message);
   process.exit(1);
 });
+
+// Triggering nodemon restart to pick up .env file
