@@ -8,9 +8,9 @@
 
 **CodeForge** is a next-generation AI-powered collaborative development platform inspired by GitHub, enhanced with intelligent automation and modern developer tools.
 
-The platform enables developers to create repositories, upload and edit source code directly in the browser, manage projects collaboratively, and leverage Artificial Intelligence to generate websites and accelerate development.
+The platform enables developers to create repositories, upload and edit source code directly in the browser, manage projects collaboratively, and leverage Artificial Intelligence to generate websites(client section) and accelerate development.
 
-Beyond traditional repository hosting, CodeForge aims to become an all-in-one ecosystem for software development by combining version control, collaboration, AI assistance, and cloud-native development workflows.
+Beyond traditional repository hosting, CodeForge aims to become an all-in-one ecosystem for software development by combining version control, collaboration, AI assistance workflows.
 
 ---
 
@@ -65,6 +65,7 @@ CodeForge unifies these workflows into a single intelligent platform where devel
 * Protected Routes
 * User Profiles
 
+
 ---
 
 ## 📁 Repository Management
@@ -107,8 +108,8 @@ Features include:
 * CSS Generation
 * JavaScript Generation
 * AI Project Scaffolding
-* Instant Code Generation
-
+* Instant Code Generation(within 20 sec)
+* view all generated websites 
 ---
 
 ## 🌐 Developer Network
@@ -367,5 +368,5 @@ Instead of switching between multiple platforms, developers can build, collabora
 # 📜 License
 
 This project is intended for academic learning, research, innovation, and collaborative software development.
-</p>
+
 
