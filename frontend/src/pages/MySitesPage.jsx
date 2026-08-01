@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMySites, deleteSite } from '../features/ai/aiThunks';
+import { fetchMySites, deleteSite, fetchSiteById } from '../features/ai/aiThunks';
 import Loader from '../components/common/Loader';
 import Modal from '../components/common/Modal';
 import { FiCpu, FiExternalLink, FiTrash2, FiClock } from 'react-icons/fi';
@@ -34,8 +34,22 @@ const MySitesPage = () => {
     }
   };
 
-  // Helper to open generated HTML in a new window using blob
-  // Since we don't store raw HTML in the list endpoint, user will just see prompt details.
+  const handlePreview = async (site) => {
+    const loadingToast = toast.loading('Loading preview...');
+    try {
+      const fullSite = await dispatch(fetchSiteById(site._id)).unwrap();
+      
+      const blob = new Blob([fullSite.html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      
+      toast.dismiss(loadingToast);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error('Failed to load preview');
+    }
+  };
+  
   // Real implementation might fetch HTML by ID on click.
   
   return (
@@ -73,14 +87,22 @@ const MySitesPage = () => {
                 <div className="flex items-center gap-1 text-xs text-dark-400">
                   <FiClock /> {timeAgo(site.createdAt)}
                 </div>
-                
-                <button 
-                  onClick={() => confirmDelete(site)}
-                  className="text-red-400 hover:text-red-300 p-1.5 rounded hover:bg-dark-800 transition-colors"
-                  title="Delete"
-                >
-                  <FiTrash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => handlePreview(site)}
+                    className="text-brand-400 hover:text-brand-300 p-1.5 rounded hover:bg-dark-800 transition-colors"
+                    title="Preview"
+                  >
+                    <FiExternalLink className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => confirmDelete(site)}
+                    className="text-red-400 hover:text-red-300 p-1.5 rounded hover:bg-dark-800 transition-colors"
+                    title="Delete"
+                  >
+                    <FiTrash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}

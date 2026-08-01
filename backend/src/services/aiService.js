@@ -17,7 +17,8 @@ RULES:
 6. Do NOT wrap the HTML in markdown code blocks. Return ONLY the raw HTML.
 7. Do NOT include any explanations, comments outside the code, or markdown formatting.
 9. The page should be fully functional and interactive where applicable.
-10. CRITICAL: Keep your CSS extremely concise. Do not write thousands of lines of CSS. Use utility classes or simple rules. You MUST finish writing the entire HTML body before you run out of tokens.`;
+10. CRITICAL: Keep your CSS extremely concise. Do not write thousands of lines of CSS. Use utility classes or simple rules. You MUST finish writing the entire HTML body before you run out of tokens.
+11. NEVER include any GitHub logos, icons, or references in the generated page.`;
 
   // Forcefully truncate the prompt if the user pastes too much text
   // This guarantees the AI won't try to build a massive app and hit the output token limit!
