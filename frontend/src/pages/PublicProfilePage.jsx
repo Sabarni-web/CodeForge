@@ -38,10 +38,10 @@ const PublicProfilePage = () => {
     coverImage: '',
     location: '',
     website: '',
-    website: '',
   });
 
   const fileInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   const isOwnProfile = currentUser && currentUser.username === username;
 
@@ -123,6 +123,28 @@ const PublicProfilePage = () => {
     }
   };
 
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size must be less than 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Cover = reader.result;
+        try {
+          await dispatch(updateProfileSocial({ coverImage: base64Cover })).unwrap();
+          toast.success('Cover photo updated successfully');
+          dispatch(fetchProfile(username));
+        } catch (error) {
+          toast.error('Failed to update cover photo');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (loading) return <Loader size="lg" text="Loading developer profile..." />;
   if (error) {
     return (
@@ -164,11 +186,28 @@ const PublicProfilePage = () => {
   return (
     <div className="min-h-screen pb-12 bg-dark-950 text-dark-100">
       {/* Cover Banner */}
-      <div className="h-48 md:h-64 w-full relative overflow-hidden bg-gradient-to-r from-brand-900/40 via-dark-900 to-indigo-950/40 border-b border-dark-800">
+      <div className="h-48 md:h-64 w-full relative overflow-hidden bg-gradient-to-r from-brand-900/40 via-dark-900 to-indigo-950/40 border-b border-dark-800 group">
         {profile.coverImage ? (
           <img src={profile.coverImage} alt="Cover" className="w-full h-full object-cover" />
         ) : (
           <div className="absolute inset-0 bg-grid-white/[0.02]" />
+        )}
+        {isOwnProfile && (
+          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              onClick={() => coverInputRef.current?.click()}
+              className="bg-black/50 hover:bg-black/70 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 backdrop-blur-sm border border-white/10"
+            >
+              <FiEdit className="w-4 h-4" /> Change Cover
+            </button>
+            <input 
+              type="file" 
+              ref={coverInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleCoverChange} 
+            />
+          </div>
         )}
       </div>
 
@@ -354,19 +393,19 @@ const PublicProfilePage = () => {
               </div>
             </div>
 
-            {/* Recent Repositories */}
+            {/* Original Repositories */}
             <div>
               <h3 className="text-lg font-bold text-dark-100 mb-3 flex items-center gap-2">
                 <FiBookOpen className="w-5 h-5 text-indigo-400" />
-                Recent Repositories
+                Original Repositories
               </h3>
-              {profile.recentRepositories?.length === 0 ? (
+              {profile.recentRepositories?.filter(r => !r.isFork).length === 0 ? (
                 <div className="glass-card p-6 text-center text-dark-400 text-sm">
-                  This user has no repositories.
+                  This user has no original repositories.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {profile.recentRepositories.map((repo) => (
+                  {profile.recentRepositories?.filter(r => !r.isFork).map((repo) => (
                     <Link
                       key={repo._id}
                       to={`/repos/${repo._id}`}
@@ -395,6 +434,47 @@ const PublicProfilePage = () => {
                 </div>
               )}
             </div>
+
+            {/* Forked Repositories */}
+            {profile.recentRepositories?.filter(r => r.isFork).length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-bold text-dark-100 mb-3 flex items-center gap-2">
+                  <FiBookOpen className="w-5 h-5 text-brand-400" />
+                  Forked Repositories
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {profile.recentRepositories.filter(r => r.isFork).map((repo) => (
+                    <Link
+                      key={repo._id}
+                      to={`/repos/${repo._id}`}
+                      className="glass-card p-5 hover:border-dark-600/40 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-brand-400 text-sm hover:underline">{repo.name}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full border border-dark-700 text-dark-400 uppercase">
+                            {repo.isPrivate ? 'Private' : 'Public'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-dark-400 mt-1">
+                          Forked from {repo.forkSourceOwner}/{repo.forkSourceRepository}
+                        </p>
+                        <p className="text-xs text-dark-300 mt-2 line-clamp-2">{repo.description || 'No description provided.'}</p>
+                      </div>
+                      <div className="mt-4 flex items-center gap-4 text-xs text-dark-400">
+                        {repo.language && (
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-brand-500" />
+                            {repo.language}
+                          </span>
+                        )}
+                        <span>⭐ {repo.stars?.length || 0}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

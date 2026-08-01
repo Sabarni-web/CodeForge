@@ -17,6 +17,7 @@ import searchRoutes from './routes/searchRoutes.js';
 import collaboratorRoutes from './routes/repositoryCollaboratorRoutes.js';
 import settingsRoutes from './routes/repositorySettingsRoutes.js';
 import repositorySearchRoutes from './routes/repositorySearchRoutes.js';
+import forkRoutes from './routes/forkRoutes.js';
 
 import errorHandler from './middleware/errorHandler.js';
 
@@ -58,6 +59,7 @@ app.use('/api/repos', repoRoutes);
 app.use('/api/repository', collaboratorRoutes);
 app.use('/api/repository', settingsRoutes);
 app.use('/api/repositories', repositorySearchRoutes);
+app.use('/api/forks', forkRoutes);
 app.use('/api/repos/:repoId/files', fileRoutes);
 app.use('/api/repos/:repoId/commits', commitRoutes);
 app.use('/api/ai', aiRoutes);

@@ -25,10 +25,15 @@ import FollowersPage from './pages/FollowersPage';
 import FollowingPage from './pages/FollowingPage';
 import RepositorySettingsPage from './pages/RepositorySettingsPage';
 import RepositorySearchPage from './pages/RepositorySearchPage';
+import RepositoryNetworkPage from './pages/RepositoryNetworkPage';
+
+import AnimatedBackground from './components/layout/AnimatedBackground';
 
 const AppRoutes = () => {
   return (
-    <Routes>
+    <>
+      <AnimatedBackground />
+      <Routes>
       {/* Public routes wrapped in MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
@@ -54,6 +59,7 @@ const AppRoutes = () => {
         <Route path="/repos/:id/settings" element={<RepositorySettingsPage />} />
         <Route path="/search-repos" element={<RepositorySearchPage />} />
         <Route path="/repos/:id/commits" element={<CommitHistoryPage />} />
+        <Route path="/repos/:id/network" element={<RepositoryNetworkPage />} />
         <Route path="/repos/:repoId/files/:fileId" element={<FileViewPage />} />
         <Route path="/repos/:repoId/files/:fileId/edit" element={<FileEditPage />} />
         
@@ -82,6 +88,7 @@ const AppRoutes = () => {
         }
       />
     </Routes>
+    </>
   );
 };
 

@@ -4,11 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchRepoById, toggleStar, deleteRepo } from '../features/repos/repoThunks';
 import { fetchFileTree, fetchFileContent, createFile, uploadBulkFiles } from '../features/files/fileThunks';
 import { clearCurrentRepo } from '../features/repos/repoSlice';
+import { forkRepository } from '../features/repos/forkSlice';
 import { fetchMembers } from '../features/repos/repositoryCollaboratorSlice';
 import FileTree from '../components/file/FileTree';
 import Loader from '../components/common/Loader';
 import Modal from '../components/common/Modal';
-import { FiStar, FiGitCommit, FiDownload, FiTrash2, FiClock, FiFileText, FiUploadCloud, FiSettings, FiGlobe, FiLock, FiActivity, FiUsers, FiEye, FiZap, FiShield } from 'react-icons/fi';
+import { FiStar, FiGitCommit, FiDownload, FiTrash2, FiClock, FiFileText, FiUploadCloud, FiSettings, FiGlobe, FiLock, FiActivity, FiUsers, FiEye, FiZap, FiShield, FiGitBranch } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import toast from 'react-hot-toast';
 import { getLanguageFromFilename } from '../utils/fileHelpers';
@@ -58,6 +59,8 @@ const RepoDetailPage = () => {
   const [readmeContent, setReadmeContent] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  const { loading: forkLoading } = useSelector((state) => state.fork);
 
   const [createFileModalOpen, setCreateFileModalOpen] = useState(false);
   const [newFileFormData, setNewFileFormData] = useState({ path: '', content: '' });
@@ -130,6 +133,18 @@ const RepoDetailPage = () => {
       await dispatch(toggleStar(id)).unwrap();
     } catch (err) {
       toast.error('Failed to star repository');
+    }
+  };
+
+  const handleFork = async () => {
+    // Allowed to fork own repository
+    const toastId = toast.loading('Forking repository...');
+    try {
+      const result = await dispatch(forkRepository(id)).unwrap();
+      toast.success('Forked successfully!', { id: toastId });
+      navigate(`/${result.repository.owner.username}/${result.repository.name}`);
+    } catch (err) {
+      toast.error(err || 'Failed to fork repository', { id: toastId });
     }
   };
 
@@ -280,6 +295,15 @@ const RepoDetailPage = () => {
               )}
             </span>
           </h1>
+          {currentRepo.isFork && currentRepo.forkSourceOwner && (
+            <p className="text-xs text-dark-400 mt-2 flex items-center gap-1.5">
+              <FiGitBranch className="text-dark-500" />
+              forked from{' '}
+              <Link to={`/${currentRepo.forkSourceOwner}/${currentRepo.forkSourceRepository}`} className="text-brand-400 hover:underline">
+                {currentRepo.forkSourceOwner}/{currentRepo.forkSourceRepository}
+              </Link>
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -291,15 +315,11 @@ const RepoDetailPage = () => {
             </span>
           </button>
 
-          <button onClick={() => toast.success('Watching repository')} className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm">
-            <FiEye />
-            <span>Watch</span>
-            <span className="ml-1 px-1.5 py-0.5 bg-dark-700 rounded-full text-xs">
-              {currentRepo.watchCount || 0}
-            </span>
-          </button>
-
-          <button onClick={() => toast.success('Forking repository...')} className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm">
+          <button 
+            onClick={handleFork} 
+            disabled={forkLoading}
+            className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm"
+          >
             <FiActivity />
             <span>Fork</span>
             <span className="ml-1 px-1.5 py-0.5 bg-dark-700 rounded-full text-xs">
@@ -307,22 +327,15 @@ const RepoDetailPage = () => {
             </span>
           </button>
           
+          <Link to={`/repos/${id}/network`} className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm">
+            <FiGitBranch /> Network
+          </Link>
+          
           <button onClick={handleDownload} className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm">
             <FiDownload /> Code
           </button>
 
-          {isOwnerOrMaintainer && (
-            <button 
-              onClick={() => toast.promise(new Promise(r => setTimeout(r, 1500)), {
-                loading: 'Deploying repository to CodeForge Pages...',
-                success: 'Deployed successfully to https://pages.codeforge.dev/' + currentRepo.name,
-                error: 'Deployment failed'
-              })}
-              className="btn-primary flex items-center gap-2 h-9 px-3 text-sm animate-pulse"
-            >
-              <FiZap /> Deploy
-            </button>
-          )}
+
 
           {isOwnerOrMaintainer && (
             <Link to={`/repos/${id}/settings`} className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm">

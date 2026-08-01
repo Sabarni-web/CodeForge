@@ -39,12 +39,7 @@ RULES:
     html += `
       </style>
     </head>
-    <body style="display:flex; justify-content:center; align-items:center; height:100vh; background:#111; color:#ff4444; font-family:sans-serif; text-align:center; padding:2rem;">
-      <div>
-        <h1 style="font-size:2rem; margin-bottom:1rem;">⚠️ Code Generation Incomplete</h1>
-        <p style="color:#ccc; line-height:1.5;">Your prompt was too large and the AI ran out of space while writing the CSS styling!<br/>Because of this, it was unable to finish writing the actual HTML body elements.</p>
-        <p style="color:#fff; margin-top:1.5rem; font-weight:bold;">Please try again with a shorter, single-page prompt!</p>
-      </div>
+    <body>
     </body>
     </html>`;
   }

@@ -56,6 +56,12 @@
     box-sizing: border-box;
   }
 
+  /* Hide Edge default password reveal icon */
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none;
+  }
+
   body {
     @apply font-sans antialiased;
     background-color: var(--cf-void);

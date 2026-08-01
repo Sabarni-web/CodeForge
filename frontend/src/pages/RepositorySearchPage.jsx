@@ -18,6 +18,7 @@ const RepositorySearchPage = () => {
     language: '',
     topics: '',
     sort: 'newest',
+    isFork: 'both',
   });
 
   const [appliedParams, setAppliedParams] = useState({
@@ -26,6 +27,7 @@ const RepositorySearchPage = () => {
     language: '',
     topics: '',
     sort: 'newest',
+    isFork: 'both',
   });
 
   // Track page inside local state or thunk
@@ -55,7 +57,7 @@ const RepositorySearchPage = () => {
   };
 
   const handleClearFilters = () => {
-    const cleared = { q: '', owner: '', language: '', topics: '', sort: 'newest' };
+    const cleared = { q: '', owner: '', language: '', topics: '', sort: 'newest', isFork: 'both' };
     setSearchParams(cleared);
     setAppliedParams(cleared);
     setCurrentPage(1);
@@ -147,6 +149,21 @@ const RepositorySearchPage = () => {
                 <option value="oldest">Oldest</option>
                 <option value="stars">Most Stars</option>
                 <option value="forks">Most Forks</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="input-label" htmlFor="isFork">Fork Type</label>
+              <select
+                id="isFork"
+                name="isFork"
+                className="input-field"
+                value={searchParams.isFork}
+                onChange={handleInputChange}
+              >
+                <option value="both">Both</option>
+                <option value="false">Original Only</option>
+                <option value="true">Forks Only</option>
               </select>
             </div>
 

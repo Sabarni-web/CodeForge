@@ -8,10 +8,7 @@ const AuthLayout = () => {
 
   return (
     <div className="cf-auth">
-      <div className="cf-auth__bg" aria-hidden="true">
-        <div className="cf-orb cf-orb--violet" />
-        <div className="cf-orb cf-orb--pink" />
-      </div>
+
 
       <div className="cf-auth__shell">
         <div className="cf-auth__brand">

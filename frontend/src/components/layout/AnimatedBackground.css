@@ -1,0 +1,115 @@
+.animated-background-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #07050d;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cf-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+}
+
+.cf-hero__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cf-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.35;
+  animation: cf-breathe 10s ease-in-out infinite;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cf-orb--violet {
+  width: 480px;
+  height: 480px;
+  background: #7c3aed;
+  top: -120px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.cf-orb--pink {
+  width: 380px;
+  height: 380px;
+  background: #ec4899;
+  bottom: -140px;
+  right: -80px;
+  animation-delay: 2s;
+}
+
+.cf-orb--blue {
+  width: 320px;
+  height: 320px;
+  background: #3b82f6;
+  top: 30%;
+  right: 15%;
+  opacity: 0.18;
+  animation-delay: 4s;
+}
+
+@keyframes cf-breathe {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.15) translateY(-20px);
+  }
+}
+
+.cf-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124, 58, 237, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 40%, transparent 90%);
+}
+
+.cf-embers {
+  position: absolute;
+  inset: 0;
+}
+
+.cf-ember {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ec4899, #7c3aed);
+  box-shadow: 0 0 8px 1px rgba(236, 72, 153, 0.7);
+  animation: cf-rise linear infinite;
+}
+
+@keyframes cf-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(30px);
+    opacity: 0;
+  }
+}

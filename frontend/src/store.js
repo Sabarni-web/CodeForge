@@ -12,6 +12,9 @@ import repositoryCollaboratorReducer from './features/repos/repositoryCollaborat
 import repositoryPermissionReducer from './features/repos/repositoryPermissionSlice';
 import repositorySearchReducer from './features/repos/repositorySearchSlice';
 import repositorySettingsReducer from './features/repos/repositorySettingsSlice';
+import forkReducer from './features/repos/forkSlice';
+import forkNetworkReducer from './features/repos/forkNetworkSlice';
+import forkAnalyticsReducer from './features/repos/forkAnalyticsSlice';
 
 const store = configureStore({
   reducer: {
@@ -28,6 +31,9 @@ const store = configureStore({
     repositoryPermissions: repositoryPermissionReducer,
     repositorySearch: repositorySearchReducer,
     repositorySettings: repositorySettingsReducer,
+    fork: forkReducer,
+    forkNetwork: forkNetworkReducer,
+    forkAnalytics: forkAnalyticsReducer,
   },
   devTools: import.meta.env.DEV,
 });

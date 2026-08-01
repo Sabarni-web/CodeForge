@@ -66,7 +66,7 @@ const RegisterPage = () => {
               id="username"
               name="username"
               className="cf-field__input"
-              placeholder="johndoe"
+              placeholder="Name"
               value={formData.username}
               onChange={handleChange}
             />
@@ -82,7 +82,7 @@ const RegisterPage = () => {
               id="email"
               name="email"
               className="cf-field__input"
-              placeholder="you@example.com"
+              placeholder="you@gmail.com"
               value={formData.email}
               onChange={handleChange}
             />
@@ -106,10 +106,10 @@ const RegisterPage = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              style={{ position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cf-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+              style={{ position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+              <FiEye className="w-4 h-4" />
             </button>
           </div>
           {error && <div className="cf-field__error">{error}</div>}

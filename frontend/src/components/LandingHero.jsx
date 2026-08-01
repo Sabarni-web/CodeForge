@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { FiCode } from 'react-icons/fi';
 import "./LandingHero.css";
 
 const COMMAND_CYCLES = [
@@ -51,14 +52,7 @@ export default function LandingHero() {
 
   const particlesRef = useRef(null);
 
-  // Parallax tracking
-  const handleMouseMove = useCallback((e) => {
-    const { clientX, clientY } = e;
-    const { innerWidth, innerHeight } = window;
-    const x = (clientX / innerWidth - 0.5) * 2; // -1 to 1
-    const y = (clientY / innerHeight - 0.5) * 2;
-    setMousePos({ x, y });
-  }, []);
+
 
   // Magnetic button effect
   const handleMagneticMove = (e) => {
@@ -132,16 +126,7 @@ export default function LandingHero() {
     };
   }, [cycleIndex]);
 
-  // Generate ember particles once
-  const embers = useRef(
-    Array.from({ length: 16 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 10,
-      duration: 7 + Math.random() * 8,
-      size: 2 + Math.random() * 4,
-    }))
-  ).current;
+
 
   const currentCycle = COMMAND_CYCLES[cycleIndex];
 
@@ -149,40 +134,7 @@ export default function LandingHero() {
     <section 
       className="cf-hero" 
       aria-label="CodeForge introduction"
-      onMouseMove={handleMouseMove}
     >
-      <div className="cf-noise" aria-hidden="true" />
-      
-      <div className="cf-hero__bg" aria-hidden="true">
-        <div 
-          className="cf-orb cf-orb--violet" 
-          style={{ transform: `translate(${mousePos.x * -15}px, ${mousePos.y * -15}px) scale(1.1)` }}
-        />
-        <div 
-          className="cf-orb cf-orb--pink" 
-          style={{ transform: `translate(${mousePos.x * 12}px, ${mousePos.y * 12}px) scale(1)` }}
-        />
-        <div 
-          className="cf-orb cf-orb--blue" 
-          style={{ transform: `translate(${mousePos.x * 20}px, ${mousePos.y * 20}px) scale(0.9)` }}
-        />
-        <div className="cf-grid" />
-        <div className="cf-embers" ref={particlesRef}>
-          {embers.map((e) => (
-            <span
-              key={e.id}
-              className="cf-ember"
-              style={{
-                left: `${e.left}%`,
-                width: `${e.size}px`,
-                height: `${e.size}px`,
-                animationDelay: `${e.delay}s`,
-                animationDuration: `${e.duration}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
 
       <nav className="cf-nav">
         <Link to="/" className="cf-nav__brand">
@@ -190,15 +142,7 @@ export default function LandingHero() {
           CodeForge
         </Link>
         <div className="cf-nav__links">
-          <Link to="/repos" className="cf-btn cf-btn--ghost">
-            Repositories
-          </Link>
-          <Link to="/ai-generator" className="cf-btn cf-btn--ghost">
-            AI Generator
-          </Link>
-          <Link to="/repos/new" className="cf-btn cf-btn--solid">
-            New
-          </Link>
+          {/* Links removed as per request */}
         </div>
       </nav>
 
@@ -219,7 +163,7 @@ export default function LandingHero() {
           </h1>
 
           <p className="cf-sub cf-reveal cf-reveal--3">
-            A full-stack GitHub alternative with a built-in AI website
+            A full-stack CodeForge alternative with a built-in AI website
             generator. Push repos, review diffs, and forge entire sites
             from a single prompt.
           </p>
@@ -231,9 +175,7 @@ export default function LandingHero() {
               onMouseMove={handleMagneticMove}
               onMouseLeave={handleMagneticLeave}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <FiCode className="w-5 h-5" aria-hidden="true" />
               My repositories
             </Link>
             <Link 
@@ -248,11 +190,6 @@ export default function LandingHero() {
           </div>
 
           <div className="cf-stats cf-reveal cf-reveal--5">
-            <div className="cf-stat">
-              <span className="cf-stat__num cf-stat-tick">{reposCount.toLocaleString()}</span>
-              <span className="cf-stat__label">Repos forged</span>
-            </div>
-            <div className="cf-stat-divider" />
             <div className="cf-stat">
               <span className="cf-stat__num">98%</span>
               <span className="cf-stat__label">Build success</span>

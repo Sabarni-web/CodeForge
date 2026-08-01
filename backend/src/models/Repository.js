@@ -93,6 +93,43 @@ const repositorySchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // Fork System Extensions
+    isFork: {
+      type: Boolean,
+      default: false,
+    },
+    forkParent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Repository',
+      default: null,
+    },
+    forkRoot: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Repository',
+      default: null,
+    },
+    forkDepth: {
+      type: Number,
+      default: 0,
+    },
+    forkCreatedAt: {
+      type: Date,
+    },
+    lastSyncAt: {
+      type: Date,
+    },
+    allowSync: {
+      type: Boolean,
+      default: true,
+    },
+    forkSourceOwner: {
+      type: String,
+      default: '',
+    },
+    forkSourceRepository: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
@@ -128,6 +165,10 @@ repositorySchema.index({ language: 1 });
 repositorySchema.index({ topics: 1 });
 repositorySchema.index({ collaborators: 1 });
 repositorySchema.index({ name: 1 });
+repositorySchema.index({ forkParent: 1 });
+repositorySchema.index({ forkRoot: 1 });
+repositorySchema.index({ forkCount: -1 });
+repositorySchema.index({ isFork: 1 });
 
 const Repository = mongoose.model('Repository', repositorySchema);
 export default Repository;

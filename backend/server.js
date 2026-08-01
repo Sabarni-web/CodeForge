@@ -26,3 +26,4 @@ startServer().catch((error) => {
 });
 
 // Triggering nodemon restart to pick up MongoDB Atlas URI
+// Restarting to clear EADDRINUSE error
