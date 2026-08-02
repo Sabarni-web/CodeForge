@@ -244,8 +244,7 @@ export const getFileContent = async (req, res, next) => {
     }
 
     const file = await File.findOne({ _id: fileId, repository: repoId, branch })
-      .populate('lastCommit', 'shortHash message createdAt')
-      .lean();
+      .populate('lastCommit', 'shortHash message createdAt');
 
     if (!file) {
       const error = new Error('File not found');
@@ -294,8 +293,6 @@ export const getFileTree = async (req, res, next) => {
     }
 
     const files = await File.find({ repository: repoId, branch })
-      .select('name path size mimeType isDirectory')
-    const files = await File.find({ repository: repoId })
       .select('name path size mimeType isDirectory version lastModified lastCommit')
       .populate({
         path: 'lastCommit',

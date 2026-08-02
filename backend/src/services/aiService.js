@@ -32,19 +32,6 @@ RULES:
   html = html.replace(/^```html?\s*/i, '').replace(/\s*```$/i, '');
   html = html.trim();
 
-  // Safeguard: If the AI hit its output token limit and got truncated in the middle of the CSS
-  // (which happens if the user gives a massive prompt), it will never close the <style> tag.
-  // This causes the browser to render a completely blank white page. 
-  // We will forcibly close the tags so the user at least sees an error message on the screen!
-  if (!html.includes('</html>')) {
-    html += `
-      </style>
-    </head>
-    <body>
-    </body>
-    </html>`;
-  }
-
   // Extract a title from the HTML
   const titleMatch = html.match(/<title>(.*?)<\/title>/i);
   const title = titleMatch ? titleMatch[1] : 'Generated Website';

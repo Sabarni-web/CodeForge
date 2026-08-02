@@ -143,7 +143,7 @@ const RepoDetailPage = () => {
           .catch(() => setReadmeContent('Failed to load README.'));
       }
     }
-  }, [tree, dispatch, id]);
+  }, [tree, dispatch, id, currentBranch]);
 
   const languages = useMemo(() => {
     if (!tree || tree.length === 0) return [];
@@ -487,7 +487,7 @@ const RepoDetailPage = () => {
                     <div className="text-xs text-dark-400 mt-0.5">Only receive notifications from this repository when participating or @mentioned.</div>
                   </div>
                 </div>
->>>>>>> 17068516cbbe9cce55222f209b5c97aa5c0a12ab
+
 
                 <div 
                   className="px-4 py-2 hover:bg-dark-800 cursor-pointer flex items-start gap-3"
@@ -669,34 +669,7 @@ const RepoDetailPage = () => {
                 <FiSearch className="text-dark-500 w-4 h-4" /> Go to file
               </button>
               
-              {canEdit && (
-                <>
-                  <input 
-                    type="file" 
-                    webkitdirectory="" 
-                    directory="" 
-                    multiple="" 
-                    className="hidden" 
-                    ref={folderInputRef}
-                    onChange={handleFolderUpload}
-                  />
-                  
-                  <button 
-                    onClick={() => folderInputRef.current?.click()}
-                    disabled={isUploadingFolder}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-dark-800 border border-dark-600 rounded hover:bg-dark-700 text-sm font-medium text-dark-200 transition-colors"
-                  >
-                    <FiUploadCloud className="text-dark-400" /> Upload Files
-                  </button>
-                  
-                  <button 
-                    onClick={() => setCreateFileModalOpen(true)} 
-                    className="px-3 py-1.5 text-sm font-medium text-dark-200 bg-dark-800 border border-dark-600 rounded hover:bg-dark-700 transition-colors"
-                  >
-                    Add file
-                  </button>
-                </>
-              )}
+
               
               <div className="relative">
                 <button onClick={() => setCodeDropdownOpen(!codeDropdownOpen)} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white font-medium text-sm rounded hover:bg-brand-700">

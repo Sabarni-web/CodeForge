@@ -9,13 +9,13 @@ import { fetchMembers } from '../features/repos/repositoryCollaboratorSlice';
 import CodeEditor from '../components/file/CodeEditor';
 import Loader from '../components/common/Loader';
 import Modal from '../components/common/Modal';
-import { FiArrowLeft, FiTrash2, FiClock, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiTrash2, FiClock, FiSave, FiEdit2 } from 'react-icons/fi';
 import { formatFileSize } from '../utils/fileHelpers';
 import { timeAgo } from '../utils/dateFormatter';
 import toast from 'react-hot-toast';
 
 import FileHistoryDrawer from '../components/sync/FileHistoryDrawer';
-import { useState } from 'react';
+
 import GuardianBadge from '../components/guardian/GuardianBadge';
 import { fetchFileCertificate } from '../features/guardian/certificateSlice';
 import { fetchFileDNA } from '../features/dna/guardianDnaSlice';
@@ -63,6 +63,8 @@ const FileViewPage = () => {
     const collab = collaborators?.find((c) => c.user?._id === user._id);
     return collab && collab.role === 'Maintainer';
   }, [currentRepo, user, collaborators]);
+
+  const isOwner = currentRepo && user && (currentRepo.owner?._id === user._id || currentRepo.owner === user._id);
 
   const hasChanges = currentFile && content !== currentFile.content;
 
@@ -173,7 +175,7 @@ const FileViewPage = () => {
         </div>
       )}
 
-      <div className={`flex-1 rounded-t-lg overflow-hidden shadow-2xl relative border ${hasChanges ? 'border-brand-500' : 'border-dark-700'}`}>
+      <div className={`flex-1 flex flex-col min-h-[500px] rounded-t-lg overflow-hidden shadow-2xl relative border ${hasChanges ? 'border-brand-500' : 'border-dark-700'}`}>
         <CodeEditor 
           filename={currentFile.name} 
           content={content} 

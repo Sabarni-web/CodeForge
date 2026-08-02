@@ -80,7 +80,7 @@ const FileEditPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 rounded-t-lg overflow-hidden shadow-2xl relative border border-dark-700">
+      <div className="flex-1 flex flex-col min-h-[500px] rounded-lg overflow-hidden shadow-2xl relative border border-brand-500">
         <CodeEditor 
           filename={currentFile.name} 
           content={content} 

@@ -7,9 +7,10 @@ const CodeEditor = ({ filename, content, onChange, readOnly = false }) => {
   const { theme } = useSelector((state) => state.ui);
 
   return (
-    <div className="border border-dark-700 rounded-lg overflow-hidden h-full w-full bg-[#1e1e1e]">
+    <div className="w-full bg-[#1e1e1e]">
       <Editor
-        height="100%"
+        height="600px"
+        width="100%"
         language={language}
         theme={theme === 'dark' ? 'vs-dark' : 'light'}
         value={content}

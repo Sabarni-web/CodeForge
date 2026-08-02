@@ -1,35 +1,37 @@
 import { Routes, Route } from 'react-router-dom';
+import React, { Suspense } from 'react';
 
 // Layouts
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import Loader from './components/common/Loader'; // Assume Loader exists for Suspense fallback
 
-// Pages
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import RepoListPage from './pages/RepoListPage';
-import CreateRepoPage from './pages/CreateRepoPage';
-import RepoDetailPage from './pages/RepoDetailPage';
-import FileViewPage from './pages/FileViewPage';
-import FileEditPage from './pages/FileEditPage';
-import CommitHistoryPage from './pages/CommitHistoryPage';
-import AIGeneratorPage from './pages/AIGeneratorPage';
-import MySitesPage from './pages/MySitesPage';
-import ProfilePage from './pages/ProfilePage';
-import SearchUsersPage from './pages/SearchUsersPage';
-import NotificationsPage from './pages/NotificationsPage';
-import PublicProfilePage from './pages/PublicProfilePage';
-import FollowersPage from './pages/FollowersPage';
-import FollowingPage from './pages/FollowingPage';
-import RepositorySettingsPage from './pages/RepositorySettingsPage';
-import RepositorySearchPage from './pages/RepositorySearchPage';
-import RepositoryNetworkPage from './pages/RepositoryNetworkPage';
-import GuardianDashboardPage from './pages/GuardianDashboardPage';
-import PublicVerificationPage from './pages/PublicVerificationPage';
-import VerificationPage from './pages/VerificationPage';
-import BranchListPage from './pages/BranchListPage';
+// Pages (Lazy Loaded)
+const HomePage = React.lazy(() => import('./pages/HomePage'));
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
+const RepoListPage = React.lazy(() => import('./pages/RepoListPage'));
+const CreateRepoPage = React.lazy(() => import('./pages/CreateRepoPage'));
+const RepoDetailPage = React.lazy(() => import('./pages/RepoDetailPage'));
+const FileViewPage = React.lazy(() => import('./pages/FileViewPage'));
+const FileEditPage = React.lazy(() => import('./pages/FileEditPage'));
+const CommitHistoryPage = React.lazy(() => import('./pages/CommitHistoryPage'));
+const AIGeneratorPage = React.lazy(() => import('./pages/AIGeneratorPage'));
+const MySitesPage = React.lazy(() => import('./pages/MySitesPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const SearchUsersPage = React.lazy(() => import('./pages/SearchUsersPage'));
+const NotificationsPage = React.lazy(() => import('./pages/NotificationsPage'));
+const PublicProfilePage = React.lazy(() => import('./pages/PublicProfilePage'));
+const FollowersPage = React.lazy(() => import('./pages/FollowersPage'));
+const FollowingPage = React.lazy(() => import('./pages/FollowingPage'));
+const RepositorySettingsPage = React.lazy(() => import('./pages/RepositorySettingsPage'));
+const RepositorySearchPage = React.lazy(() => import('./pages/RepositorySearchPage'));
+const RepositoryNetworkPage = React.lazy(() => import('./pages/RepositoryNetworkPage'));
+const GuardianDashboardPage = React.lazy(() => import('./pages/GuardianDashboardPage'));
+const PublicVerificationPage = React.lazy(() => import('./pages/PublicVerificationPage'));
+const VerificationPage = React.lazy(() => import('./pages/VerificationPage'));
+const BranchListPage = React.lazy(() => import('./pages/BranchListPage'));
 
 import AnimatedBackground from './components/layout/AnimatedBackground';
 
@@ -37,6 +39,7 @@ const AppRoutes = () => {
   return (
     <>
       <AnimatedBackground />
+      <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader /></div>}>
       <Routes>
       {/* Public routes wrapped in MainLayout */}
       <Route element={<MainLayout />}>
@@ -97,6 +100,7 @@ const AppRoutes = () => {
         }
       />
     </Routes>
+      </Suspense>
     </>
   );
 };

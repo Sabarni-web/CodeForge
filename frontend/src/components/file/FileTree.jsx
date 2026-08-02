@@ -39,41 +39,21 @@ const FileTreeNode = ({ item, level = 0, repoId }) => {
           </span>
         </div>
 
-        <div className="hidden sm:block flex-1 min-w-0 text-sm text-dark-400 truncate px-4">
-          <span className="hover:text-brand-400 hover:underline">Updated code with fixes/features</span>
-        </div>
-
-        <div className="text-sm text-dark-400 text-right whitespace-nowrap">
-          4 months ago
-        </div>
-        
-        <FileIcon filename={item.name} isDirectory={isDir} isOpen={isOpen} className="w-4 h-4 mr-2" />
-        
-        <div className="flex-1 flex items-center min-w-0">
-          {isDir ? (
-            <span className="text-dark-200 text-sm truncate">{item.name}</span>
-          ) : (
-            <span className="text-dark-200 text-sm hover:text-brand-400 truncate">{item.name}</span>
-          )}
-        </div>
-
         {/* File Metadata */}
-        {!isDir && (
-          <div className="hidden md:flex items-center gap-4 text-xs text-dark-400 w-2/3 shrink-0">
-            <span className="truncate w-1/3" title={item.lastCommit?.message || 'No commit message'}>
-              {item.lastCommit?.message || '-'}
-            </span>
-            <span className="w-16 shrink-0 text-center">
-              v{item.version || 1}
-            </span>
-            <span className="truncate w-1/4">
-              {item.lastCommit?.author?.username || '-'}
-            </span>
-            <span className="w-32 shrink-0 text-right pr-2">
-              {item.lastModified ? new Date(item.lastModified).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : '-'}
-            </span>
-          </div>
-        )}
+        <div className="hidden md:flex items-center gap-4 text-xs text-dark-400 w-2/3 shrink-0">
+          <span className="truncate w-1/3" title={item.lastCommit?.message || (isDir ? '-' : 'No commit message')}>
+            {item.lastCommit?.message || '-'}
+          </span>
+          <span className="w-16 shrink-0 text-center">
+            {isDir ? '-' : `v${item.version || 1}`}
+          </span>
+          <span className="truncate w-1/4">
+            {item.lastCommit?.author?.username || '-'}
+          </span>
+          <span className="w-32 shrink-0 text-right pr-2">
+            {item.lastModified ? new Date(item.lastModified).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
+          </span>
+        </div>
       </div>
 
       {isDir && isOpen && item.children && (
