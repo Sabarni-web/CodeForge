@@ -487,10 +487,7 @@ const RepoDetailPage = () => {
                     <div className="text-xs text-dark-400 mt-0.5">Only receive notifications from this repository when participating or @mentioned.</div>
                   </div>
                 </div>
-<<<<<<< HEAD
 
-=======
->>>>>>> 779a91703239f76f09cb41b3656cb3f991a642da
 
                 <div 
                   className="px-4 py-2 hover:bg-dark-800 cursor-pointer flex items-start gap-3"
