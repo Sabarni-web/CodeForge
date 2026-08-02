@@ -42,6 +42,7 @@ const fileSchema = new mongoose.Schema(
       type: String,
       default: 'main',
       index: true,
+    },
     hash: {
       type: String,
       default: '',

@@ -9,13 +9,12 @@ import { fetchMembers } from '../features/repos/repositoryCollaboratorSlice';
 import CodeEditor from '../components/file/CodeEditor';
 import Loader from '../components/common/Loader';
 import Modal from '../components/common/Modal';
-import { FiArrowLeft, FiTrash2, FiClock, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiTrash2, FiClock, FiSave, FiEdit2 } from 'react-icons/fi';
 import { formatFileSize } from '../utils/fileHelpers';
 import { timeAgo } from '../utils/dateFormatter';
 import toast from 'react-hot-toast';
 
 import FileHistoryDrawer from '../components/sync/FileHistoryDrawer';
-import { useState } from 'react';
 import GuardianBadge from '../components/guardian/GuardianBadge';
 import { fetchFileCertificate } from '../features/guardian/certificateSlice';
 import { fetchFileDNA } from '../features/dna/guardianDnaSlice';
@@ -63,6 +62,8 @@ const FileViewPage = () => {
     const collab = collaborators?.find((c) => c.user?._id === user._id);
     return collab && collab.role === 'Maintainer';
   }, [currentRepo, user, collaborators]);
+
+  const isOwner = user && currentRepo && (user._id === (currentRepo.owner?._id || currentRepo.owner));
 
   const hasChanges = currentFile && content !== currentFile.content;
 

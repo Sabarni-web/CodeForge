@@ -12,8 +12,10 @@ const useSocket = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const socketRef = useRef(null);
 
+  const userId = user?._id;
+
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userId) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -31,7 +33,7 @@ const useSocket = () => {
 
     socket.on('connect', () => {
       console.log('Socket.IO connected. Registering user...');
-      socket.emit('register', user._id);
+      socket.emit('register', userId);
     });
 
     socket.on('new_notification', (notification) => {
@@ -55,7 +57,7 @@ const useSocket = () => {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [isAuthenticated, user, dispatch]);
+  }, [isAuthenticated, userId, dispatch]);
 
   return socketRef.current;
 };
