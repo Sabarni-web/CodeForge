@@ -9,8 +9,8 @@ export const forkRepository = async (req, res) => {
     
     // Return populated response
     const populatedRepo = await Repository.findById(newRepo._id)
-      .populate('owner', 'username avatarUrl name')
-      .populate('collaborators', 'username avatarUrl')
+      .populate('owner', 'username avatar name')
+      .populate('collaborators', 'username avatar')
       .populate('stars', 'username');
 
     res.status(201).json({
@@ -27,7 +27,7 @@ export const getUserForks = async (req, res) => {
   try {
     const userId = req.user.id;
     const forks = await Repository.find({ owner: userId, isFork: true })
-      .populate('owner', 'username avatarUrl name')
+      .populate('owner', 'username avatar name')
       .sort({ createdAt: -1 });
 
     res.status(200).json(forks);
@@ -41,7 +41,7 @@ export const getRepositoryForks = async (req, res) => {
   try {
     const { id } = req.params;
     const forks = await Repository.find({ forkParent: id, isPrivate: false })
-      .populate('owner', 'username avatarUrl name')
+      .populate('owner', 'username avatar name')
       .sort({ createdAt: -1 });
 
     res.status(200).json(forks);

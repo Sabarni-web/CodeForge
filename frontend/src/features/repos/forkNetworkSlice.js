@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../api/axiosConfig';
 
-const API_URL = '/api/forks';
+const API_URL = '/forks';
 
 export const fetchRepositoryNetwork = createAsyncThunk(
   'forkNetwork/fetchRepositoryNetwork',
   async (repoId, thunkAPI) => {
     try {
-      const response = await axios.get(`${API_URL}/${repoId}/network`);
+      const response = await api.get(`${API_URL}/${repoId}/network`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -19,7 +19,7 @@ export const fetchUpstreamRepository = createAsyncThunk(
   'forkNetwork/fetchUpstreamRepository',
   async (repoId, thunkAPI) => {
     try {
-      const response = await axios.get(`${API_URL}/${repoId}/upstream`);
+      const response = await api.get(`${API_URL}/${repoId}/upstream`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);

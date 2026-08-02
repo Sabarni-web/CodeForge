@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../api/axiosConfig';
 
 // While it's in the forks API, the backend implementation might be inside an explore or analytics controller.
 // For now we assume we might need a dedicated endpoint, but in our backend plan, we didn't explicitly create it yet.
@@ -14,7 +14,7 @@ export const fetchTrendingForks = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       // Assuming we have an endpoint like this. If not, we will just use search
-      const response = await axios.get('/api/repos?isFork=true&sort=-forkCount&limit=10');
+      const response = await api.get('/repos?isFork=true&sort=-forkCount&limit=10');
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);

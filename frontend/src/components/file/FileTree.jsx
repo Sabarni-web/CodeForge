@@ -19,16 +19,32 @@ const FileTreeNode = ({ item, level = 0, repoId }) => {
   };
 
   return (
-    <div className="select-none">
+    <>
       <div
-        className={`flex items-center py-1.5 px-2 hover:bg-dark-800/50 rounded transition-colors cursor-pointer`}
-        style={{ paddingLeft: `${level * 16 + 8}px` }}
+        className="flex items-center justify-between py-2 px-4 hover:bg-dark-800 border-b border-dark-700/50 transition-colors cursor-pointer group"
         onClick={handleClick}
       >
-        <div className="w-4 h-4 mr-1 flex items-center justify-center">
-          {isDir && (
-            isOpen ? <FiChevronDown className="w-3 h-3 text-dark-400" /> : <FiChevronRight className="w-3 h-3 text-dark-400" />
-          )}
+        <div className="flex items-center gap-2 flex-1 min-w-0" style={{ paddingLeft: `${level * 16}px` }}>
+          <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
+            {isDir && (
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -ml-5">
+                {isOpen ? <FiChevronDown className="w-3 h-3 text-dark-500" /> : <FiChevronRight className="w-3 h-3 text-dark-500" />}
+              </div>
+            )}
+            <FileIcon filename={item.name} isDirectory={isDir} isOpen={isOpen} className="w-4 h-4" />
+          </div>
+          
+          <span className={`text-sm truncate ${isDir ? 'text-dark-100' : 'text-dark-100 hover:text-brand-400 hover:underline'}`}>
+            {item.name}
+          </span>
+        </div>
+
+        <div className="hidden sm:block flex-1 min-w-0 text-sm text-dark-400 truncate px-4">
+          <span className="hover:text-brand-400 hover:underline">Updated code with fixes/features</span>
+        </div>
+
+        <div className="text-sm text-dark-400 text-right whitespace-nowrap">
+          4 months ago
         </div>
         
         <FileIcon filename={item.name} isDirectory={isDir} isOpen={isOpen} className="w-4 h-4 mr-2" />
@@ -61,13 +77,13 @@ const FileTreeNode = ({ item, level = 0, repoId }) => {
       </div>
 
       {isDir && isOpen && item.children && (
-        <div>
+        <div className="w-full">
           {item.children.map((child) => (
             <FileTreeNode key={child.path} item={child} level={level + 1} repoId={repoId} />
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -75,6 +91,13 @@ const FileTree = ({ tree, repoId }) => {
   if (!tree || tree.length === 0) {
     return <div className="p-4 text-dark-400 text-sm text-center">Repository is empty.</div>;
   }
+
+  // Sort: directories first, then files
+  const sortedTree = [...tree].sort((a, b) => {
+    if (a.type === 'directory' && b.type === 'file') return -1;
+    if (a.type === 'file' && b.type === 'directory') return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   return (
     <div className="bg-dark-900 rounded-lg border border-dark-700 p-2 overflow-x-auto">
@@ -89,9 +112,9 @@ const FileTree = ({ tree, repoId }) => {
         </div>
       </div>
       <div className="font-mono">
-      {tree.map((item) => (
-        <FileTreeNode key={item.path} item={item} repoId={repoId} />
-      ))}
+        {sortedTree.map((item) => (
+          <FileTreeNode key={item.path} item={item} repoId={repoId} />
+        ))}
       </div>
     </div>
   );

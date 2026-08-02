@@ -18,6 +18,7 @@ import collaboratorRoutes from './routes/repositoryCollaboratorRoutes.js';
 import settingsRoutes from './routes/repositorySettingsRoutes.js';
 import repositorySearchRoutes from './routes/repositorySearchRoutes.js';
 import forkRoutes from './routes/forkRoutes.js';
+import branchRoutes from './routes/branchRoutes.js';
 import syncRoutes from './routes/syncRoutes.js';
 
 import errorHandler from './middleware/errorHandler.js';
@@ -38,8 +39,8 @@ app.use(
 );
 
 // Body parsers
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '500mb' }));
+app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
 // Cookie parser
 app.use(cookieParser());
@@ -63,6 +64,7 @@ app.use('/api/repositories', repositorySearchRoutes);
 app.use('/api/forks', forkRoutes);
 app.use('/api/repos/:repoId/files', fileRoutes);
 app.use('/api/repos/:repoId/commits', commitRoutes);
+app.use('/api/repos/:repoId/branches', branchRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/users', searchRoutes);
 app.use('/api/users', userRoutes);

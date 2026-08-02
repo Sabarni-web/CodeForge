@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../api/axiosConfig';
 
-const API_URL = '/api/forks';
+const API_URL = '/forks';
 
 export const forkRepository = createAsyncThunk(
   'fork/forkRepository',
   async (repoId, thunkAPI) => {
     try {
-      const response = await axios.post(`${API_URL}/${repoId}/fork`);
+      const response = await api.post(`${API_URL}/${repoId}/fork`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -19,7 +19,7 @@ export const fetchUserForks = createAsyncThunk(
   'fork/fetchUserForks',
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get(`${API_URL}/user`);
+      const response = await api.get(`${API_URL}/user`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -31,7 +31,7 @@ export const fetchRepositoryForks = createAsyncThunk(
   'fork/fetchRepositoryForks',
   async (repoId, thunkAPI) => {
     try {
-      const response = await axios.get(`${API_URL}/${repoId}/forks`);
+      const response = await api.get(`${API_URL}/${repoId}/forks`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
@@ -43,7 +43,7 @@ export const checkIsFork = createAsyncThunk(
   'fork/checkIsFork',
   async (repoId, thunkAPI) => {
     try {
-      const response = await axios.get(`${API_URL}/${repoId}/is-fork`);
+      const response = await api.get(`${API_URL}/${repoId}/is-fork`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);

@@ -10,7 +10,7 @@ import { createCommitHash } from '../utils/hashGenerator.js';
  * @param {Array} params.files - Array of { file, action, filePath }
  * @returns {Promise<object>} Created commit document
  */
-export const createCommit = async ({ message, authorId, repoId, files = [] }) => {
+export const createCommit = async ({ message, authorId, repoId, files = [], branch = 'main' }) => {
   // Generate unique hash
   const { hash, shortHash } = createCommitHash({
     message,
@@ -18,8 +18,8 @@ export const createCommit = async ({ message, authorId, repoId, files = [] }) =>
     repoId,
   });
 
-  // Find the latest commit for this repo (to set as parent)
-  const latestCommit = await Commit.findOne({ repository: repoId })
+  // Find the latest commit for this repo and branch (to set as parent)
+  const latestCommit = await Commit.findOne({ repository: repoId, branch })
     .sort({ createdAt: -1 })
     .lean();
 
@@ -30,6 +30,7 @@ export const createCommit = async ({ message, authorId, repoId, files = [] }) =>
     author: authorId,
     repository: repoId,
     files,
+    branch,
     parentCommit: latestCommit?._id || null,
   });
 
@@ -43,17 +44,17 @@ export const createCommit = async ({ message, authorId, repoId, files = [] }) =>
  * @param {number} limit - Number of commits per page
  * @returns {Promise<{ commits: Array, total: number, page: number, totalPages: number }>}
  */
-export const getCommitHistory = async (repoId, page = 1, limit = 20) => {
+export const getCommitHistory = async (repoId, page = 1, limit = 20, branch = 'main') => {
   const skip = (page - 1) * limit;
 
   const [commits, total] = await Promise.all([
-    Commit.find({ repository: repoId })
+    Commit.find({ repository: repoId, branch })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate('author', 'username avatar')
       .lean(),
-    Commit.countDocuments({ repository: repoId }),
+    Commit.countDocuments({ repository: repoId, branch }),
   ]);
 
   return {

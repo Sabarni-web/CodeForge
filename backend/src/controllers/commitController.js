@@ -11,6 +11,7 @@ export const getRepoCommits = async (req, res, next) => {
     const { repoId } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
+    const branch = req.query.branch || 'main';
 
     const repo = await Repository.findById(repoId).lean();
     if (!repo) {
@@ -25,7 +26,7 @@ export const getRepoCommits = async (req, res, next) => {
       throw error;
     }
 
-    const result = await getCommitHistory(repoId, page, limit);
+    const result = await getCommitHistory(repoId, page, limit, branch);
 
     res.status(200).json({
       success: true,

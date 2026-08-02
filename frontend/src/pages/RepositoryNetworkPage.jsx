@@ -66,10 +66,12 @@ const RepositoryNetworkPage = () => {
                 <FiGitBranch className="text-dark-400" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    {repo.owner?.avatarUrl ? (
-                      <img src={repo.owner.avatarUrl} alt="avatar" className="w-5 h-5 rounded-full" />
+                    {repo.owner?.avatar ? (
+                      <img src={repo.owner.avatar} alt="avatar" className="w-5 h-5 rounded-full" />
                     ) : (
-                      <FiUser className="w-5 h-5 text-dark-400" />
+                      <div className="w-5 h-5 rounded-full bg-dark-700 flex items-center justify-center">
+                        <FiUsers className="w-3 h-3 text-dark-400" />
+                      </div>
                     )}
                     <Link to={`/${repo.owner?.username}/${repo.name}`} className="text-brand-400 font-semibold hover:underline">
                       {repo.owner?.username} / {repo.name}

@@ -14,18 +14,19 @@ const FileEditPage = () => {
   const navigate = useNavigate();
 
   const { currentFile, loading, saving } = useSelector((state) => state.files);
+  const { currentBranch } = useSelector((state) => state.branches);
   const [content, setContent] = useState('');
   const [commitMessage, setCommitMessage] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchFileContent({ repoId, fileId }))
+    dispatch(fetchFileContent({ repoId, fileId, branch: currentBranch }))
       .unwrap()
       .then((file) => {
         setContent(file.content);
         setCommitMessage(`Update ${file.name}`);
       });
-  }, [dispatch, repoId, fileId]);
+  }, [dispatch, repoId, fileId, currentBranch]);
 
   const handleSave = async () => {
     try {
@@ -34,6 +35,7 @@ const FileEditPage = () => {
         fileId,
         content,
         commitMessage: commitMessage || `Update ${currentFile.name}`,
+        branch: currentBranch,
       })).unwrap();
       
       toast.success('File saved successfully');
@@ -45,7 +47,7 @@ const FileEditPage = () => {
 
   const handleDelete = async () => {
     try {
-      await dispatch(deleteFile({ repoId, fileId })).unwrap();
+      await dispatch(deleteFile({ repoId, fileId, branch: currentBranch })).unwrap();
       toast.success('File deleted');
       navigate(`/repos/${repoId}`);
     } catch (error) {

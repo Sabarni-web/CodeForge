@@ -26,6 +26,7 @@ import FollowingPage from './pages/FollowingPage';
 import RepositorySettingsPage from './pages/RepositorySettingsPage';
 import RepositorySearchPage from './pages/RepositorySearchPage';
 import RepositoryNetworkPage from './pages/RepositoryNetworkPage';
+import BranchListPage from './pages/BranchListPage';
 
 import AnimatedBackground from './components/layout/AnimatedBackground';
 
@@ -57,6 +58,7 @@ const AppRoutes = () => {
         <Route path="/repos/new" element={<CreateRepoPage />} />
         <Route path="/repos/:id" element={<RepoDetailPage />} />
         <Route path="/repos/:id/settings" element={<RepositorySettingsPage />} />
+        <Route path="/repos/:id/branches" element={<BranchListPage />} />
         <Route path="/search-repos" element={<RepositorySearchPage />} />
         <Route path="/repos/:id/commits" element={<CommitHistoryPage />} />
         <Route path="/repos/:id/network" element={<RepositoryNetworkPage />} />

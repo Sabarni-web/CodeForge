@@ -65,6 +65,11 @@ const commitSchema = new mongoose.Schema(
       ref: 'Commit',
       default: null,
     },
+    branch: {
+      type: String,
+      default: 'main',
+      index: true,
+    },
   },
   {
     timestamps: true,

@@ -3,9 +3,9 @@ import { getFileTreeAPI, getFileContentAPI, createFileAPI, updateFileAPI, delete
 
 export const fetchFileTree = createAsyncThunk(
   'files/fetchFileTree',
-  async (repoId, { rejectWithValue }) => {
+  async ({ repoId, branch = 'main' }, { rejectWithValue }) => {
     try {
-      const { data } = await getFileTreeAPI(repoId);
+      const { data } = await getFileTreeAPI(repoId, branch);
       return data.tree;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -15,9 +15,9 @@ export const fetchFileTree = createAsyncThunk(
 
 export const fetchFileContent = createAsyncThunk(
   'files/fetchFileContent',
-  async ({ repoId, fileId }, { rejectWithValue }) => {
+  async ({ repoId, fileId, branch = 'main' }, { rejectWithValue }) => {
     try {
-      const { data } = await getFileContentAPI(repoId, fileId);
+      const { data } = await getFileContentAPI(repoId, fileId, branch);
       return data.file;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -27,9 +27,9 @@ export const fetchFileContent = createAsyncThunk(
 
 export const createFile = createAsyncThunk(
   'files/createFile',
-  async ({ repoId, fileData }, { rejectWithValue }) => {
+  async ({ repoId, fileData, branch = 'main' }, { rejectWithValue }) => {
     try {
-      const { data } = await createFileAPI(repoId, fileData);
+      const { data } = await createFileAPI(repoId, { ...fileData, branch });
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -39,9 +39,9 @@ export const createFile = createAsyncThunk(
 
 export const uploadBulkFiles = createAsyncThunk(
   'files/uploadBulkFiles',
-  async ({ repoId, files }, { rejectWithValue }) => {
+  async ({ repoId, files, branch = 'main' }, { rejectWithValue }) => {
     try {
-      const { data } = await uploadBulkFilesAPI(repoId, files);
+      const { data } = await uploadBulkFilesAPI(repoId, files, branch);
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -51,9 +51,9 @@ export const uploadBulkFiles = createAsyncThunk(
 
 export const updateFile = createAsyncThunk(
   'files/updateFile',
-  async ({ repoId, fileId, content, commitMessage }, { rejectWithValue }) => {
+  async ({ repoId, fileId, content, commitMessage, branch = 'main' }, { rejectWithValue }) => {
     try {
-      const { data } = await updateFileAPI(repoId, fileId, { content, commitMessage });
+      const { data } = await updateFileAPI(repoId, fileId, { content, commitMessage, branch });
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -63,9 +63,9 @@ export const updateFile = createAsyncThunk(
 
 export const deleteFile = createAsyncThunk(
   'files/deleteFile',
-  async ({ repoId, fileId }, { rejectWithValue }) => {
+  async ({ repoId, fileId, branch = 'main' }, { rejectWithValue }) => {
     try {
-      await deleteFileAPI(repoId, fileId);
+      await deleteFileAPI(repoId, fileId, branch);
       return fileId;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -75,9 +75,9 @@ export const deleteFile = createAsyncThunk(
 
 export const fetchCommits = createAsyncThunk(
   'files/fetchCommits',
-  async ({ repoId, page = 1 }, { rejectWithValue }) => {
+  async ({ repoId, page = 1, branch = 'main' }, { rejectWithValue }) => {
     try {
-      const { data } = await getCommitsAPI(repoId, page);
+      const { data } = await getCommitsAPI(repoId, page, branch);
       return { commits: data.commits, total: data.total };
     } catch (error) {
       return rejectWithValue(error.message);

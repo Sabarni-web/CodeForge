@@ -10,7 +10,7 @@ export const getRepositoryNetwork = async (rootRepoId) => {
       { forkRoot: rootRepoId }
     ]
   })
-  .populate('owner', 'username avatarUrl')
+  .populate('owner', 'username avatar')
   .select('_id name owner isFork forkParent forkRoot forkDepth forkCount createdAt')
   .sort({ forkDepth: 1, createdAt: 1 });
 
@@ -23,7 +23,7 @@ export const getUpstreamRepository = async (repoId) => {
     return null;
   }
   
-  const parentRepo = await Repository.findById(repo.forkParent._id).populate('owner', 'username avatarUrl');
+  const parentRepo = await Repository.findById(repo.forkParent._id).populate('owner', 'username avatar');
   return parentRepo;
 };
 
@@ -32,6 +32,6 @@ export const getTrendingForks = async (limit = 10) => {
   const trending = await Repository.find({ isFork: true, isPrivate: false })
     .sort({ forkCount: -1, createdAt: -1 })
     .limit(limit)
-    .populate('owner', 'username avatarUrl');
+    .populate('owner', 'username avatar');
   return trending;
 };
