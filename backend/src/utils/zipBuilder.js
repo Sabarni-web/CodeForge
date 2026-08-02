@@ -1,5 +1,7 @@
 import archiver from 'archiver';
 import File from '../models/File.js';
+import Repository from '../models/Repository.js';
+import OwnershipCertificate from '../models/OwnershipCertificate.js';
 
 /**
  * Stream a .zip archive of all files in a repository
@@ -9,6 +11,7 @@ import File from '../models/File.js';
  */
 export const streamRepoZip = async (repoId, repoName, res) => {
   const files = await File.find({ repository: repoId }).lean();
+  const repository = await Repository.findById(repoId);
 
   res.setHeader('Content-Type', 'application/zip');
   res.setHeader('Content-Disposition', `attachment; filename="${repoName}.zip"`);
@@ -27,5 +30,34 @@ export const streamRepoZip = async (repoId, repoName, res) => {
     }
   }
 
+  // Add README if content exists
+  if (repository.readme) {
+    archive.append(repository.readme, { name: 'README.md' });
+  }
+
+  // Check if Guardian is enabled, inject Ownership Certificate
+  if (repository.guardianEnabled) {
+    const certificate = await OwnershipCertificate.findOne({
+      targetId: repository._id,
+      type: 'REPOSITORY'
+    }).lean();
+
+    if (certificate) {
+      const certData = {
+        certificateId: certificate.certificateId,
+        type: certificate.type,
+        issuedAt: certificate.issuedAt,
+        expiresAt: certificate.expiresAt,
+        digitalSignature: certificate.digitalSignature,
+        repositoryInfo: {
+          name: repository.name,
+          id: repository._id
+        }
+      };
+      archive.append(JSON.stringify(certData, null, 2), { name: '.guardian_certificate.json' });
+    }
+  }
+
+  // Finalize the archive
   await archive.finalize();
 };

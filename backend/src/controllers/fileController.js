@@ -3,6 +3,8 @@ import Repository from '../models/Repository.js';
 import { createCommit } from '../services/commitService.js';
 import { buildFileTree } from '../services/fileTreeService.js';
 import { getMimeType } from '../utils/constants.js';
+import { processFileBuffer } from '../services/guardianService.js';
+import { queueFileDNA } from '../workers/dnaWorker.js';
 
 /**
  * @desc    Upload / create a new file in a repository
@@ -37,13 +39,19 @@ export const createFile = async (req, res, next) => {
 
     const contentBuffer = Buffer.from(content || '', 'utf-8');
 
+    // Process Guardian Certificate
+    const guardianResult = processFileBuffer(name, contentBuffer, repo, req.user);
+
     const file = await File.create({
       name,
       path: filePath,
-      content: contentBuffer,
+      content: guardianResult.buffer,
       repository: repoId,
-      size: contentBuffer.length,
+      size: guardianResult.buffer.length,
       mimeType: getMimeType(name),
+      guardianProtected: guardianResult.certificateInserted,
+      fileCertificateId: guardianResult.fileCertificateId,
+      certificateInsertedAt: guardianResult.certificateInserted ? new Date() : undefined,
     });
 
     // Create a commit for this file addition
@@ -56,6 +64,9 @@ export const createFile = async (req, res, next) => {
 
     file.lastCommit = commit._id;
     await file.save();
+
+    // Trigger CodeDNA generation (asynchronous)
+    queueFileDNA(file._id, true, repoId);
 
     res.status(201).json({
       success: true,
@@ -108,8 +119,19 @@ export const updateFile = async (req, res, next) => {
     }
 
     const contentBuffer = Buffer.from(content || '', 'utf-8');
-    file.content = contentBuffer;
-    file.size = contentBuffer.length;
+    
+    // Process Guardian Certificate
+    const guardianResult = processFileBuffer(file.name, contentBuffer, repo, req.user);
+
+    file.content = guardianResult.buffer;
+    file.size = guardianResult.buffer.length;
+    
+    // Only update these if a new certificate was inserted, do not overwrite if it already had one
+    if (guardianResult.certificateInserted) {
+      file.guardianProtected = true;
+      file.fileCertificateId = guardianResult.fileCertificateId;
+      file.certificateInsertedAt = new Date();
+    }
 
     // Create a commit for this file update
     const commit = await createCommit({
@@ -121,6 +143,9 @@ export const updateFile = async (req, res, next) => {
 
     file.lastCommit = commit._id;
     await file.save();
+
+    // Trigger CodeDNA generation
+    queueFileDNA(file._id, true, repoId);
 
     res.status(200).json({
       success: true,
@@ -334,13 +359,18 @@ export const uploadBulkFiles = async (req, res, next) => {
       const name = filePath.split('/').pop();
       const contentBuffer = Buffer.from(content || '', 'utf-8');
 
+      const guardianResult = processFileBuffer(name, contentBuffer, repo, req.user);
+
       const file = new File({
         name,
         path: filePath,
-        content: contentBuffer,
+        content: guardianResult.buffer,
         repository: repoId,
-        size: contentBuffer.length,
+        size: guardianResult.buffer.length,
         mimeType: getMimeType(name),
+        guardianProtected: guardianResult.certificateInserted,
+        fileCertificateId: guardianResult.fileCertificateId,
+        certificateInsertedAt: guardianResult.certificateInserted ? new Date() : undefined,
       });
 
       createdFiles.push(file);
@@ -360,6 +390,15 @@ export const uploadBulkFiles = async (req, res, next) => {
     }
 
     await File.insertMany(createdFiles);
+
+    // Trigger CodeDNA generation for all new files
+    createdFiles.forEach(f => queueFileDNA(f._id, false));
+    // Trigger repo DNA update once
+    if (createdFiles.length > 0) {
+      import('../workers/dnaWorker.js').then(({ queueRepositoryDNA }) => {
+        queueRepositoryDNA(repoId);
+      });
+    }
 
     res.status(201).json({
       success: true,

@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateProfileAPI } from '../api/commitApi'; // using commitApi.js for user profile for now based on previous structure
 import { fetchMe } from '../features/auth/authThunks';
+import { fetchDashboard } from '../features/guardian/guardianDashboardSlice';
 import Loader from '../components/common/Loader';
-import { FiUser, FiMail, FiEdit3, FiSave } from 'react-icons/fi';
+import { FiUser, FiMail, FiEdit3, FiSave, FiShield } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { user, loading } = useSelector((state) => state.auth);
+  const { data: guardianData, loading: guardianLoading } = useSelector((state) => state.guardianDashboard);
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ bio: '', avatar: '' });
@@ -21,8 +23,9 @@ const ProfilePage = () => {
         bio: user.bio || '',
         avatar: user.avatar || '',
       });
+      dispatch(fetchDashboard());
     }
-  }, [user]);
+  }, [user, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -178,6 +181,52 @@ const ProfilePage = () => {
               </div>
             )}
           </form>
+
+          {/* Guardian Stats & Achievements */}
+          {!guardianLoading && guardianData && (
+            <div className="mt-8 bg-dark-900 border border-dark-700 rounded-xl p-6 shadow-xl">
+              <h2 className="text-xl font-bold text-dark-100 flex items-center gap-2 mb-6">
+                <FiShield className="text-emerald-400" /> Guardian Statistics
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                <div className="text-center p-4 bg-dark-800 rounded border border-dark-700">
+                  <div className="text-2xl font-bold text-emerald-400">{guardianData.overview.protectedRepositories}</div>
+                  <div className="text-xs text-dark-400">Protected Repos</div>
+                </div>
+                <div className="text-center p-4 bg-dark-800 rounded border border-dark-700">
+                  <div className="text-2xl font-bold text-dark-200">{guardianData.overview.certificatesGenerated}</div>
+                  <div className="text-xs text-dark-400">Certificates</div>
+                </div>
+                <div className="text-center p-4 bg-dark-800 rounded border border-dark-700">
+                  <div className="text-2xl font-bold text-dark-200">{guardianData.overview.verificationRequestsMade}</div>
+                  <div className="text-xs text-dark-400">Verifications</div>
+                </div>
+                <div className="text-center p-4 bg-dark-800 rounded border border-dark-700">
+                  <div className="text-2xl font-bold text-brand-400">{guardianData.overview.verificationsMatched}</div>
+                  <div className="text-xs text-dark-400">Verified Matches</div>
+                </div>
+              </div>
+
+              <h3 className="font-semibold text-dark-100 mb-4">Achievements</h3>
+              <div className="flex flex-wrap gap-4">
+                {guardianData.overview.protectedRepositories > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-emerald-900/20 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm font-semibold" title="Has at least one protected repository">
+                    <FiShield className="w-5 h-5" /> Guardian Protected
+                  </div>
+                )}
+                {guardianData.overview.verificationsMatched > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-brand-900/20 border border-brand-500/30 text-brand-400 rounded-lg text-sm font-semibold" title="Code originality verified">
+                    <FiShield className="w-5 h-5" /> Verified Author
+                  </div>
+                )}
+                {guardianData.overview.protectedRepositories >= 5 && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-purple-900/20 border border-purple-500/30 text-purple-400 rounded-lg text-sm font-semibold" title="Early adopter of Guardian">
+                    <FiShield className="w-5 h-5" /> Guardian Pioneer
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

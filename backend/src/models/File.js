@@ -50,6 +50,21 @@ const fileSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // Guardian System Extensions
+    fileCertificateId: {
+      type: String,
+    },
+    ownershipVerified: {
+      type: Boolean,
+      default: false,
+    },
+    guardianProtected: {
+      type: Boolean,
+      default: false,
+    },
+    certificateInsertedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

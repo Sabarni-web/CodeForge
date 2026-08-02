@@ -22,9 +22,10 @@ import Modal from '../components/common/Modal';
 import { 
   FiSettings, FiShield, FiUsers, FiAlertTriangle, FiTrash2, 
   FiLock, FiUnlock, FiUserPlus, FiUserMinus, FiGlobe, 
-  FiCheck, FiX, FiInfo 
+  FiCheck, FiX, FiInfo, FiCheckSquare 
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import GuardianSettings from '../components/guardian/GuardianSettings';
 
 const RepositorySettingsPage = () => {
   const { id } = useParams();
@@ -249,6 +250,18 @@ const RepositorySettingsPage = () => {
             Collaborators
           </button>
 
+          <button
+            onClick={() => setActiveTab('guardian')}
+            className={`flex items-center gap-2.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+              activeTab === 'guardian'
+                ? 'bg-brand-500/10 text-brand-400 border-l-2 border-brand-500'
+                : 'text-dark-300 hover:bg-dark-800'
+            }`}
+          >
+            <FiShield className="w-4 h-4" />
+            Guardian
+          </button>
+
           {isRepoOwner && (
             <button
               onClick={() => setActiveTab('danger')}
@@ -260,6 +273,20 @@ const RepositorySettingsPage = () => {
             >
               <FiAlertTriangle className="w-4 h-4" />
               Danger Zone
+            </button>
+          )}
+
+          {isRepoOwner && (
+            <button
+              onClick={() => setActiveTab('guardian')}
+              className={`flex items-center gap-2.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+                activeTab === 'guardian'
+                  ? 'bg-brand-500/10 text-brand-400 border-l-2 border-brand-500'
+                  : 'text-dark-300 hover:bg-dark-800'
+              }`}
+            >
+              <FiCheckSquare className="w-4 h-4" />
+              Guardian
             </button>
           )}
         </aside>
@@ -535,6 +562,13 @@ const RepositorySettingsPage = () => {
             </div>
           )}
 
+          {activeTab === 'guardian' && (
+            <div className="space-y-6 animate-fadeIn">
+              <h2 className="text-xl font-bold text-dark-100 border-b border-dark-700 pb-2">CodeForge Guardian™ Settings</h2>
+              <GuardianSettings repoId={id} />
+            </div>
+          )}
+
           {/* DANGER ZONE TAB */}
           {activeTab === 'danger' && isRepoOwner && (
             <div className="glass-card border border-red-500/30 bg-red-500/5 p-6 space-y-6">
@@ -580,6 +614,11 @@ const RepositorySettingsPage = () => {
 
               </div>
             </div>
+          )}
+
+          {/* GUARDIAN TAB */}
+          {activeTab === 'guardian' && isRepoOwner && (
+            <GuardianSettings repoId={id} />
           )}
 
         </div>

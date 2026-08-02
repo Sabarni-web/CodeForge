@@ -11,6 +11,10 @@ import { timeAgo } from '../utils/dateFormatter';
 
 import FileHistoryDrawer from '../components/sync/FileHistoryDrawer';
 import { useState } from 'react';
+import GuardianBadge from '../components/guardian/GuardianBadge';
+import { fetchFileCertificate } from '../features/guardian/certificateSlice';
+import { fetchFileDNA } from '../features/dna/guardianDnaSlice';
+import { FingerPrintIcon } from '@heroicons/react/24/solid';
 
 const FileViewPage = () => {
   const { repoId, fileId } = useParams();
@@ -20,11 +24,14 @@ const FileViewPage = () => {
   const { currentFile, loading, error } = useSelector((state) => state.files);
   const { currentRepo } = useSelector((state) => state.repos);
   const { user } = useSelector((state) => state.auth);
+  const { fileDNA } = useSelector((state) => state.guardianDna);
   
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchFileContent({ repoId, fileId }));
+    dispatch(fetchFileCertificate(fileId));
+    dispatch(fetchFileDNA(fileId));
 
     return () => {
       dispatch(clearCurrentFile());
@@ -52,7 +59,16 @@ const FileViewPage = () => {
           <FiArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-dark-50">{currentFile.path}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-dark-50">{currentFile.path}</h1>
+            <GuardianBadge fileId={fileId} />
+            {fileDNA && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1" title="CodeDNA Fingerprint Verified">
+                <FingerPrintIcon className="w-3.5 h-3.5" />
+                Verified
+              </span>
+            )}
+          </div>
           <div className="text-sm text-dark-400 flex items-center gap-3 mt-1">
             <span>{formatFileSize(currentFile.size)}</span>
             <span>•</span>

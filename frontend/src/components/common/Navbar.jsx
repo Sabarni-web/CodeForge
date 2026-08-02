@@ -4,7 +4,7 @@ import { logoutUser } from '../../features/auth/authThunks';
 import { toggleTheme } from '../../features/ui/uiSlice';
 import { acceptFollowRequest, rejectFollowRequest } from '../../features/follow/followSlice';
 import { markNotificationRead } from '../../features/notifications/notificationSlice';
-import { FiCode, FiCpu, FiPlus, FiSun, FiMoon, FiUser, FiLogOut, FiGlobe, FiBell, FiUsers, FiSettings, FiSearch } from 'react-icons/fi';
+import { FiCode, FiCpu, FiPlus, FiSun, FiMoon, FiUser, FiLogOut, FiGlobe, FiBell, FiUsers, FiSettings, FiSearch, FiShield } from 'react-icons/fi';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import './Navbar.css';
@@ -165,6 +165,11 @@ const Navbar = () => {
                 <FiSearch className="w-5 h-5" />
               </Link>
 
+              {/* Verify Code Icon */}
+              <Link to="/guardian/verify" className="p-2 text-emerald-400 hover:text-emerald-300 transition-colors mr-2" aria-label="Verify Code">
+                <FiShield className="w-5 h-5" />
+              </Link>
+
               {/* Notifications Icon with Badge */}
               <div className="relative cf-notif-wrap" ref={notifDropdownRef}>
                 <button 
@@ -284,6 +289,14 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            <Link to="/search-users" className={`cf-navbar__mobile-link ${isActive('/search-users') ? 'is-active' : ''}`}>
+              <FiSearch />
+              Search Users
+            </Link>
+            <Link to="/guardian/verify" className={`cf-navbar__mobile-link text-emerald-400 ${isActive('/guardian/verify') ? 'is-active' : ''}`}>
+              <FiShield />
+              Verify Code
+            </Link>
             <Link to="/profile" className={`cf-navbar__mobile-link ${isActive('/profile') ? 'is-active' : ''}`}>
               <FiUser />
               Profile

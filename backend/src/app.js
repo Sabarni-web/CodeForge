@@ -19,6 +19,11 @@ import settingsRoutes from './routes/repositorySettingsRoutes.js';
 import repositorySearchRoutes from './routes/repositorySearchRoutes.js';
 import forkRoutes from './routes/forkRoutes.js';
 import syncRoutes from './routes/syncRoutes.js';
+import guardianRoutes from './routes/guardianRoutes.js';
+import dnaRoutes from './routes/dnaRoutes.js';
+import verificationRoutes from './routes/verificationRoutes.js';
+import guardianDashboardRoutes from './routes/guardianDashboardRoutes.js';
+import guardianAnalyticsRoutes from './routes/guardianAnalyticsRoutes.js';
 
 import errorHandler from './middleware/errorHandler.js';
 
@@ -38,8 +43,8 @@ app.use(
 );
 
 // Body parsers
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '500mb' }));
+app.use(express.urlencoded({ extended: true, limit: '500mb' }));
 
 // Cookie parser
 app.use(cookieParser());
@@ -70,6 +75,11 @@ app.use('/api/follow', followRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api', syncRoutes);
+app.use('/api', guardianRoutes);
+app.use('/api', dnaRoutes);
+app.use('/api/guardian', verificationRoutes);
+app.use('/api/guardian', guardianDashboardRoutes);
+app.use('/api/guardian', guardianAnalyticsRoutes);
 
 // Download repo as zip
 import auth from './middleware/auth.js';

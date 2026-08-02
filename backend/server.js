@@ -18,6 +18,8 @@ const startServer = async () => {
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 CodeForge server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
   });
+
+  // Trigger nodemon restart 2
 };
 
 startServer().catch((error) => {
@@ -27,3 +29,5 @@ startServer().catch((error) => {
 
 // Triggering nodemon restart to pick up MongoDB Atlas URI
 // Restarting to clear EADDRINUSE error
+
+// force restart

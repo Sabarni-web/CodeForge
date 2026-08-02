@@ -139,6 +139,21 @@ const repositorySchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // Guardian System Extensions
+    guardianEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    guardianCreatedAt: {
+      type: Date,
+    },
+    guardianVersion: {
+      type: String,
+      default: '1.0.0',
+    },
+    certificateId: {
+      type: String,
+    },
   },
   {
     timestamps: true,

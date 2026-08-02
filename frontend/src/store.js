@@ -16,6 +16,14 @@ import forkReducer from './features/repos/forkSlice';
 import forkNetworkReducer from './features/repos/forkNetworkSlice';
 import forkAnalyticsReducer from './features/repos/forkAnalyticsSlice';
 import syncReducer from './features/sync/syncSlice';
+import guardianReducer from './features/guardian/guardianSlice.js';
+import certificateReducer from './features/guardian/certificateSlice.js';
+import guardianDashboardReducer from './features/guardian/guardianDashboardSlice.js';
+import guardianAnalyticsReducer from './features/guardian/guardianAnalyticsSlice.js';
+import guardianDnaReducer from './features/dna/guardianDnaSlice.js';
+import repositoryDnaReducer from './features/dna/repositoryDnaSlice.js';
+import verificationReducer from './features/verification/verificationSlice.js';
+import guardianReportReducer from './features/verification/guardianReportSlice.js';
 
 const store = configureStore({
   reducer: {
@@ -36,6 +44,14 @@ const store = configureStore({
     forkNetwork: forkNetworkReducer,
     forkAnalytics: forkAnalyticsReducer,
     sync: syncReducer,
+    guardian: guardianReducer,
+    certificate: certificateReducer,
+    guardianDashboard: guardianDashboardReducer,
+    guardianAnalytics: guardianAnalyticsReducer,
+    guardianDna: guardianDnaReducer,
+    repositoryDna: repositoryDnaReducer,
+    verification: verificationReducer,
+    guardianReport: guardianReportReducer,
   },
   devTools: import.meta.env.DEV,
 });

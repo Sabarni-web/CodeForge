@@ -6,6 +6,7 @@ import { hasAccess } from '../services/repositoryPermissionService.js';
 import { getIo } from '../services/socketService.js';
 import crypto from 'crypto';
 import Notification from '../models/Notification.js';
+import { queueFileDNA, queueRepositoryDNA } from '../workers/dnaWorker.js';
 
 // Helper to calculate hash on backend just in case
 const generateHash = (buffer) => {
@@ -212,6 +213,19 @@ export const syncRepository = async (req, res, next) => {
     }
 
     await newCommit.save();
+
+    // Trigger CodeDNA generation for all modified/added files
+    const changedFiles = [...(added || []), ...(modified || [])];
+    if (changedFiles.length > 0) {
+      changedFiles.forEach(cf => {
+        // Find the file id by path to queue
+        File.findOne({ repository: repoId, path: cf.path }).then(f => {
+          if (f) queueFileDNA(f._id, false);
+        });
+      });
+      // Trigger repo DNA summary
+      queueRepositoryDNA(repoId);
+    }
 
     // Create Notification
     const ownerId = repo.owner.toString();

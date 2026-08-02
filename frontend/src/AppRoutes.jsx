@@ -26,6 +26,9 @@ import FollowingPage from './pages/FollowingPage';
 import RepositorySettingsPage from './pages/RepositorySettingsPage';
 import RepositorySearchPage from './pages/RepositorySearchPage';
 import RepositoryNetworkPage from './pages/RepositoryNetworkPage';
+import GuardianDashboardPage from './pages/GuardianDashboardPage';
+import PublicVerificationPage from './pages/PublicVerificationPage';
+import VerificationPage from './pages/VerificationPage';
 
 import AnimatedBackground from './components/layout/AnimatedBackground';
 
@@ -37,6 +40,7 @@ const AppRoutes = () => {
       {/* Public routes wrapped in MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/guardian/public-verify" element={<PublicVerificationPage />} />
       </Route>
 
       {/* Auth routes wrapped in AuthLayout */}
@@ -58,6 +62,9 @@ const AppRoutes = () => {
         <Route path="/repos/:id" element={<RepoDetailPage />} />
         <Route path="/repos/:id/settings" element={<RepositorySettingsPage />} />
         <Route path="/search-repos" element={<RepositorySearchPage />} />
+        <Route path="/guardian/verify" element={<VerificationPage />} />
+        <Route path="/guardian/report/:id" element={<VerificationPage />} />
+        <Route path="/guardian/dashboard" element={<GuardianDashboardPage />} />
         <Route path="/repos/:id/commits" element={<CommitHistoryPage />} />
         <Route path="/repos/:id/network" element={<RepositoryNetworkPage />} />
         <Route path="/repos/:repoId/files/:fileId" element={<FileViewPage />} />

@@ -16,6 +16,7 @@ import { getLanguageFromFilename } from '../utils/fileHelpers';
 import { FiRefreshCw } from 'react-icons/fi';
 import SyncRepositoryModal from '../components/sync/SyncRepositoryModal';
 import { clearSyncState } from '../features/sync/syncSlice';
+import GuardianStatusCard from '../components/guardian/GuardianStatusCard';
 
 import { compareSync as compareSyncThunk } from '../features/sync/syncThunks';
 
@@ -378,6 +379,11 @@ const RepoDetailPage = () => {
                 </>
               )}
             </span>
+            {currentRepo.guardianEnabled && (
+              <span className="ml-2 badge border border-emerald-500/30 bg-emerald-900/20 text-emerald-400 align-middle inline-flex items-center gap-1.5" title="CodeForge Guardian Protected">
+                <FiShield className="w-3.5 h-3.5" /> Protected
+              </span>
+            )}
           </h1>
           {currentRepo.isFork && currentRepo.forkSourceOwner && (
             <p className="text-xs text-dark-400 mt-2 flex items-center gap-1.5">
@@ -418,6 +424,12 @@ const RepoDetailPage = () => {
           <button onClick={handleDownload} className="btn-secondary flex items-center gap-2 h-9 px-3 text-sm">
             <FiDownload /> Code
           </button>
+
+          {currentRepo.guardianEnabled && (
+            <Link to="/guardian/verify" state={{ targetRepoId: currentRepo._id }} className="btn-primary bg-emerald-600 hover:bg-emerald-500 flex items-center gap-2 h-9 px-3 text-sm">
+              <FiShield /> Verify Code
+            </Link>
+          )}
 
 
 
@@ -516,6 +528,8 @@ const RepoDetailPage = () => {
 
         {/* Sidebar (Right, 1 col) */}
         <div className="space-y-6">
+          <GuardianStatusCard repoId={id} />
+          
           <div>
             <h3 className="font-semibold text-dark-100 mb-2">About</h3>
             <p className="text-dark-300 text-sm mb-4">
