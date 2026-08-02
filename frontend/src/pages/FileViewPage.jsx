@@ -9,6 +9,9 @@ import { FiArrowLeft, FiEdit2, FiTrash2, FiClock } from 'react-icons/fi';
 import { formatFileSize } from '../utils/fileHelpers';
 import { timeAgo } from '../utils/dateFormatter';
 
+import FileHistoryDrawer from '../components/sync/FileHistoryDrawer';
+import { useState } from 'react';
+
 const FileViewPage = () => {
   const { repoId, fileId } = useParams();
   const dispatch = useDispatch();
@@ -17,6 +20,8 @@ const FileViewPage = () => {
   const { currentFile, loading, error } = useSelector((state) => state.files);
   const { currentRepo } = useSelector((state) => state.repos);
   const { user } = useSelector((state) => state.auth);
+  
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchFileContent({ repoId, fileId }));
@@ -57,6 +62,12 @@ const FileViewPage = () => {
 
         {isOwner && (
           <div className="ml-auto flex items-center gap-2">
+            <button 
+              onClick={() => setIsHistoryOpen(true)}
+              className="btn-secondary flex items-center gap-2 h-9 px-3"
+            >
+              <FiClock className="w-4 h-4" /> History
+            </button>
             <Link to={`/repos/${repoId}/files/${fileId}/edit`} className="btn-secondary flex items-center gap-2 h-9 px-3">
               <FiEdit2 className="w-4 h-4" /> Edit
             </Link>
@@ -88,6 +99,12 @@ const FileViewPage = () => {
           readOnly={true} 
         />
       </div>
+
+      <FileHistoryDrawer 
+        isOpen={isHistoryOpen} 
+        onClose={() => setIsHistoryOpen(false)} 
+        fileId={fileId} 
+      />
     </div>
   );
 };

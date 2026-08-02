@@ -13,6 +13,11 @@ import { FiStar, FiGitCommit, FiDownload, FiTrash2, FiClock, FiFileText, FiUploa
 import ReactMarkdown from 'react-markdown';
 import toast from 'react-hot-toast';
 import { getLanguageFromFilename } from '../utils/fileHelpers';
+import { FiRefreshCw } from 'react-icons/fi';
+import SyncRepositoryModal from '../components/sync/SyncRepositoryModal';
+import { clearSyncState } from '../features/sync/syncSlice';
+
+import { compareSync as compareSyncThunk } from '../features/sync/syncThunks';
 
 const languageColors = {
   javascript: '#f1e05a',
@@ -68,6 +73,12 @@ const RepoDetailPage = () => {
 
   const [isUploadingFolder, setIsUploadingFolder] = useState(false);
   const folderInputRef = useRef(null);
+
+  // Sync Logic
+  const syncInputRef = useRef(null);
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [localFilesContent, setLocalFilesContent] = useState({});
+  const { diff, isComparing } = useSelector((state) => state.sync);
 
   useEffect(() => {
     dispatch(fetchRepoById(id));
@@ -256,6 +267,79 @@ const RepoDetailPage = () => {
     }
   };
 
+  const handleSyncClick = () => {
+    syncInputRef.current?.click();
+  };
+
+  const generateHash = async (arrayBuffer) => {
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleSyncFolderSelection = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const toastId = toast.loading('Analyzing local folder...');
+    try {
+      const localFiles = [];
+      const contentMap = {};
+      const excludePatterns = [
+        /node_modules\//, /\.git\//, /\.vscode\//, /\.idea\//, 
+        /dist\//, /build\//, /coverage\//, /\.next\//, /\.cache\//, 
+        /temp\//, /logs\//, /(^|\/)\.[^\/]+$/, /Thumbs\.db$/, 
+        /Desktop\.ini$/, /\.DS_Store$/, /\.env\.local$/, 
+        /npm-debug\.log$/, /yarn\.lock$/, /package-lock\.json$/
+      ];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (excludePatterns.some(pattern => pattern.test(file.webkitRelativePath))) continue;
+        if (file.size > 5 * 1024 * 1024) continue; // Skip files > 5MB for simplicity
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const hash = await generateHash(arrayBuffer);
+          
+          // Also need text content for payload
+          const textContent = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => resolve('');
+            reader.readAsText(file);
+          });
+
+          if (textContent !== '') {
+            localFiles.push({
+              path: file.webkitRelativePath,
+              hash,
+              size: file.size,
+              lastModified: file.lastModified
+            });
+            contentMap[file.webkitRelativePath] = textContent;
+          }
+        } catch (e) {
+          console.error("Failed to read file:", file.webkitRelativePath, e);
+        }
+      }
+
+      setLocalFilesContent(contentMap);
+      toast.loading('Comparing with repository...', { id: toastId });
+      
+      await dispatch(compareSyncThunk({ repoId: id, localFiles })).unwrap();
+      
+      toast.dismiss(toastId);
+      setSyncModalOpen(true);
+    } catch (err) {
+      toast.error(err || 'Failed to analyze folder', { id: toastId });
+    } finally {
+      if (syncInputRef.current) {
+        syncInputRef.current.value = '';
+      }
+    }
+  };
+
   if (repoLoading && !currentRepo) return <Loader size="lg" text="Loading repository..." />;
   
   if (repoError) {
@@ -377,7 +461,23 @@ const RepoDetailPage = () => {
                   disabled={isUploadingFolder}
                   className="text-xs bg-dark-700 hover:bg-dark-600 px-2 py-1 rounded transition-colors text-dark-200 flex items-center gap-1 disabled:opacity-50"
                 >
-                  <FiUploadCloud /> {isUploadingFolder ? 'Uploading...' : 'Upload folder'}
+                  <FiUploadCloud /> {isUploadingFolder ? 'Uploading...' : 'Upload Files'}
+                </button>
+                <input 
+                  type="file" 
+                  webkitdirectory="" 
+                  directory="" 
+                  className="hidden" 
+                  ref={syncInputRef}
+                  onChange={handleSyncFolderSelection}
+                />
+                <button 
+                  onClick={handleSyncClick}
+                  disabled={isComparing}
+                  className="text-xs bg-brand-600/20 hover:bg-brand-600/30 text-brand-400 border border-brand-500/30 px-3 py-1 rounded transition-colors flex items-center gap-1 disabled:opacity-50"
+                >
+                  {isComparing ? <div className="w-3 h-3 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" /> : <FiRefreshCw />}
+                  Sync Changes
                 </button>
                 <button 
                   onClick={() => setCreateFileModalOpen(true)} 
@@ -573,6 +673,14 @@ const RepoDetailPage = () => {
           </div>
         </form>
       </Modal>
+
+      <SyncRepositoryModal
+        isOpen={syncModalOpen}
+        onClose={() => setSyncModalOpen(false)}
+        repoId={id}
+        diff={diff}
+        localFilesContent={localFilesContent}
+      />
     </div>
   );
 };

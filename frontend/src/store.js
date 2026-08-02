@@ -15,6 +15,7 @@ import repositorySettingsReducer from './features/repos/repositorySettingsSlice'
 import forkReducer from './features/repos/forkSlice';
 import forkNetworkReducer from './features/repos/forkNetworkSlice';
 import forkAnalyticsReducer from './features/repos/forkAnalyticsSlice';
+import syncReducer from './features/sync/syncSlice';
 
 const store = configureStore({
   reducer: {
@@ -34,6 +35,7 @@ const store = configureStore({
     fork: forkReducer,
     forkNetwork: forkNetworkReducer,
     forkAnalytics: forkAnalyticsReducer,
+    sync: syncReducer,
   },
   devTools: import.meta.env.DEV,
 });

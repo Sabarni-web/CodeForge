@@ -130,6 +130,15 @@ const repositorySchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // Sync System Extensions
+    totalVersions: {
+      type: Number,
+      default: 1,
+    },
+    lastSyncedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,

@@ -27,6 +27,7 @@ const fileSlice = createSlice({
       // File tree
       .addCase(fetchFileTree.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchFileTree.fulfilled, (state, action) => {
         state.loading = false;
@@ -40,6 +41,7 @@ const fileSlice = createSlice({
       // File content
       .addCase(fetchFileContent.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchFileContent.fulfilled, (state, action) => {
         state.loading = false;
@@ -53,6 +55,7 @@ const fileSlice = createSlice({
       // Create file
       .addCase(createFile.pending, (state) => {
         state.saving = true;
+        state.error = null;
       })
       .addCase(createFile.fulfilled, (state) => {
         state.saving = false;
@@ -65,6 +68,7 @@ const fileSlice = createSlice({
       // Update file
       .addCase(updateFile.pending, (state) => {
         state.saving = true;
+        state.error = null;
       })
       .addCase(updateFile.fulfilled, (state) => {
         state.saving = false;
@@ -82,6 +86,7 @@ const fileSlice = createSlice({
       // Commits
       .addCase(fetchCommits.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchCommits.fulfilled, (state, action) => {
         state.loading = false;

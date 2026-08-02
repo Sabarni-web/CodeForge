@@ -15,7 +15,7 @@ const startServer = async () => {
   const server = http.createServer(app);
   initSocket(server);
 
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 CodeForge server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
   });
 };

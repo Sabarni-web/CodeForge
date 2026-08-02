@@ -44,6 +44,22 @@ const commitSchema = new mongoose.Schema(
         },
       },
     ],
+    addedFiles: {
+      type: [String],
+      default: [],
+    },
+    modifiedFiles: {
+      type: [String],
+      default: [],
+    },
+    deletedFiles: {
+      type: [String],
+      default: [],
+    },
+    totalChangedFiles: {
+      type: Number,
+      default: 0,
+    },
     parentCommit: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Commit',

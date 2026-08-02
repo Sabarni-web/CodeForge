@@ -40,6 +40,9 @@ export const buildFileTree = (files) => {
             type: file.isDirectory ? 'directory' : 'file',
             size: file.size || 0,
             mimeType: file.mimeType || 'text/plain',
+            version: file.version || 1,
+            lastModified: file.lastModified,
+            lastCommit: file.lastCommit,
             children: file.isDirectory ? [] : undefined,
           });
         }

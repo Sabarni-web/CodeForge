@@ -262,7 +262,15 @@ export const getFileTree = async (req, res, next) => {
     }
 
     const files = await File.find({ repository: repoId })
-      .select('name path size mimeType isDirectory')
+      .select('name path size mimeType isDirectory version lastModified lastCommit')
+      .populate({
+        path: 'lastCommit',
+        select: 'message createdAt author',
+        populate: {
+          path: 'author',
+          select: 'username',
+        },
+      })
       .lean();
 
     const tree = buildFileTree(files);

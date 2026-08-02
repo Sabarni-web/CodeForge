@@ -33,10 +33,30 @@ const FileTreeNode = ({ item, level = 0, repoId }) => {
         
         <FileIcon filename={item.name} isDirectory={isDir} isOpen={isOpen} className="w-4 h-4 mr-2" />
         
-        {isDir ? (
-          <span className="text-dark-200 text-sm">{item.name}</span>
-        ) : (
-          <span className="text-dark-200 text-sm hover:text-brand-400">{item.name}</span>
+        <div className="flex-1 flex items-center min-w-0">
+          {isDir ? (
+            <span className="text-dark-200 text-sm truncate">{item.name}</span>
+          ) : (
+            <span className="text-dark-200 text-sm hover:text-brand-400 truncate">{item.name}</span>
+          )}
+        </div>
+
+        {/* File Metadata */}
+        {!isDir && (
+          <div className="hidden md:flex items-center gap-4 text-xs text-dark-400 w-2/3 shrink-0">
+            <span className="truncate w-1/3" title={item.lastCommit?.message || 'No commit message'}>
+              {item.lastCommit?.message || '-'}
+            </span>
+            <span className="w-16 shrink-0 text-center">
+              v{item.version || 1}
+            </span>
+            <span className="truncate w-1/4">
+              {item.lastCommit?.author?.username || '-'}
+            </span>
+            <span className="w-32 shrink-0 text-right pr-2">
+              {item.lastModified ? new Date(item.lastModified).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : '-'}
+            </span>
+          </div>
         )}
       </div>
 
@@ -57,10 +77,22 @@ const FileTree = ({ tree, repoId }) => {
   }
 
   return (
-    <div className="font-mono bg-dark-900 rounded-lg border border-dark-700 p-2 overflow-x-auto">
+    <div className="bg-dark-900 rounded-lg border border-dark-700 p-2 overflow-x-auto">
+      {/* Header */}
+      <div className="hidden md:flex items-center py-2 px-2 border-b border-dark-700/50 mb-2 text-xs font-semibold text-dark-300 select-none">
+        <div className="flex-1 pl-6">File Name</div>
+        <div className="flex items-center gap-4 w-2/3 shrink-0">
+          <div className="w-1/3">Commit Message</div>
+          <div className="w-16 text-center">Version</div>
+          <div className="w-1/4">Updated By</div>
+          <div className="w-32 text-right pr-2">Last Updated</div>
+        </div>
+      </div>
+      <div className="font-mono">
       {tree.map((item) => (
         <FileTreeNode key={item.path} item={item} repoId={repoId} />
       ))}
+      </div>
     </div>
   );
 };

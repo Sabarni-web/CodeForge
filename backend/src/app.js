@@ -18,6 +18,7 @@ import collaboratorRoutes from './routes/repositoryCollaboratorRoutes.js';
 import settingsRoutes from './routes/repositorySettingsRoutes.js';
 import repositorySearchRoutes from './routes/repositorySearchRoutes.js';
 import forkRoutes from './routes/forkRoutes.js';
+import syncRoutes from './routes/syncRoutes.js';
 
 import errorHandler from './middleware/errorHandler.js';
 
@@ -68,6 +69,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/follow', followRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api', syncRoutes);
 
 // Download repo as zip
 import auth from './middleware/auth.js';
