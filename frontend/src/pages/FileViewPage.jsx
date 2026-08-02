@@ -15,7 +15,10 @@ import { timeAgo } from '../utils/dateFormatter';
 import toast from 'react-hot-toast';
 
 import FileHistoryDrawer from '../components/sync/FileHistoryDrawer';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 779a91703239f76f09cb41b3656cb3f991a642da
 import GuardianBadge from '../components/guardian/GuardianBadge';
 import { fetchFileCertificate } from '../features/guardian/certificateSlice';
 import { fetchFileDNA } from '../features/dna/guardianDnaSlice';
@@ -64,7 +67,11 @@ const FileViewPage = () => {
     return collab && collab.role === 'Maintainer';
   }, [currentRepo, user, collaborators]);
 
+<<<<<<< HEAD
   const isOwner = currentRepo && user && (currentRepo.owner?._id === user._id || currentRepo.owner === user._id);
+=======
+  const isOwner = user && currentRepo && (user._id === (currentRepo.owner?._id || currentRepo.owner));
+>>>>>>> 779a91703239f76f09cb41b3656cb3f991a642da
 
   const hasChanges = currentFile && content !== currentFile.content;
 
