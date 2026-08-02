@@ -29,6 +29,7 @@ import RepositoryNetworkPage from './pages/RepositoryNetworkPage';
 import GuardianDashboardPage from './pages/GuardianDashboardPage';
 import PublicVerificationPage from './pages/PublicVerificationPage';
 import VerificationPage from './pages/VerificationPage';
+import BranchListPage from './pages/BranchListPage';
 
 import AnimatedBackground from './components/layout/AnimatedBackground';
 
@@ -61,6 +62,7 @@ const AppRoutes = () => {
         <Route path="/repos/new" element={<CreateRepoPage />} />
         <Route path="/repos/:id" element={<RepoDetailPage />} />
         <Route path="/repos/:id/settings" element={<RepositorySettingsPage />} />
+        <Route path="/repos/:id/branches" element={<BranchListPage />} />
         <Route path="/search-repos" element={<RepositorySearchPage />} />
         <Route path="/guardian/verify" element={<VerificationPage />} />
         <Route path="/guardian/report/:id" element={<VerificationPage />} />

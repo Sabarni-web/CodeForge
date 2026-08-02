@@ -21,6 +21,9 @@ const fileSlice = createSlice({
     clearCurrentFile: (state) => {
       state.currentFile = null;
     },
+    clearTree: (state) => {
+      state.tree = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -100,5 +103,5 @@ const fileSlice = createSlice({
   },
 });
 
-export const { clearFileError, clearCurrentFile } = fileSlice.actions;
+export const { clearFileError, clearCurrentFile, clearTree } = fileSlice.actions;
 export default fileSlice.reducer;

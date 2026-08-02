@@ -38,6 +38,10 @@ const fileSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    branch: {
+      type: String,
+      default: 'main',
+      index: true,
     hash: {
       type: String,
       default: '',
@@ -71,8 +75,8 @@ const fileSchema = new mongoose.Schema(
   }
 );
 
-// Compound index: unique file path per repository
-fileSchema.index({ path: 1, repository: 1 }, { unique: true });
+// Compound index: unique file path per repository per branch
+fileSchema.index({ path: 1, repository: 1, branch: 1 }, { unique: true });
 
 const File = mongoose.model('File', fileSchema);
 export default File;

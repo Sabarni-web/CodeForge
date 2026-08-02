@@ -14,7 +14,7 @@ import { queueFileDNA } from '../workers/dnaWorker.js';
 export const createFile = async (req, res, next) => {
   try {
     const { repoId } = req.params;
-    const { name, path: filePath, content } = req.body;
+    const { name, path: filePath, content, branch = 'main' } = req.body;
 
     const repo = await Repository.findById(repoId);
     if (!repo) {
@@ -23,21 +23,23 @@ export const createFile = async (req, res, next) => {
       throw error;
     }
 
-    if (repo.owner.toString() !== req.user._id.toString()) {
-      const error = new Error('Only the owner can add files');
-      error.statusCode = 403;
-      throw error;
-    }
+
 
     // Check for duplicate path
-    const existing = await File.findOne({ path: filePath, repository: repoId }).lean();
+    const existing = await File.findOne({ path: filePath, repository: repoId, branch }).lean();
     if (existing) {
-      const error = new Error('A file with this path already exists');
+      const error = new Error('A file with this path already exists in this branch');
       error.statusCode = 400;
       throw error;
     }
 
     const contentBuffer = Buffer.from(content || '', 'utf-8');
+    
+    if (contentBuffer.length > 10 * 1024 * 1024) {
+      const error = new Error('File size exceeds the 10MB limit');
+      error.statusCode = 400;
+      throw error;
+    }
 
     // Process Guardian Certificate
     const guardianResult = processFileBuffer(name, contentBuffer, repo, req.user);
@@ -47,6 +49,7 @@ export const createFile = async (req, res, next) => {
       path: filePath,
       content: guardianResult.buffer,
       repository: repoId,
+      branch,
       size: guardianResult.buffer.length,
       mimeType: getMimeType(name),
       guardianProtected: guardianResult.certificateInserted,
@@ -60,6 +63,7 @@ export const createFile = async (req, res, next) => {
       authorId: req.user._id,
       repoId,
       files: [{ file: file._id, action: 'added', filePath }],
+      branch,
     });
 
     file.lastCommit = commit._id;
@@ -96,7 +100,7 @@ export const createFile = async (req, res, next) => {
 export const updateFile = async (req, res, next) => {
   try {
     const { repoId, fileId } = req.params;
-    const { content, commitMessage } = req.body;
+    const { content, commitMessage, branch = 'main' } = req.body;
 
     const repo = await Repository.findById(repoId);
     if (!repo) {
@@ -105,13 +109,9 @@ export const updateFile = async (req, res, next) => {
       throw error;
     }
 
-    if (repo.owner.toString() !== req.user._id.toString()) {
-      const error = new Error('Only the owner can edit files');
-      error.statusCode = 403;
-      throw error;
-    }
 
-    const file = await File.findOne({ _id: fileId, repository: repoId });
+
+    const file = await File.findOne({ _id: fileId, repository: repoId, branch });
     if (!file) {
       const error = new Error('File not found');
       error.statusCode = 404;
@@ -120,6 +120,12 @@ export const updateFile = async (req, res, next) => {
 
     const contentBuffer = Buffer.from(content || '', 'utf-8');
     
+    if (contentBuffer.length > 10 * 1024 * 1024) {
+      const error = new Error('File size exceeds the 10MB limit');
+      error.statusCode = 400;
+      throw error;
+    }
+
     // Process Guardian Certificate
     const guardianResult = processFileBuffer(file.name, contentBuffer, repo, req.user);
 
@@ -139,6 +145,7 @@ export const updateFile = async (req, res, next) => {
       authorId: req.user._id,
       repoId,
       files: [{ file: file._id, action: 'modified', filePath: file.path }],
+      branch,
     });
 
     file.lastCommit = commit._id;
@@ -174,6 +181,7 @@ export const updateFile = async (req, res, next) => {
 export const deleteFile = async (req, res, next) => {
   try {
     const { repoId, fileId } = req.params;
+    const branch = req.query.branch || 'main';
 
     const repo = await Repository.findById(repoId);
     if (!repo) {
@@ -182,13 +190,9 @@ export const deleteFile = async (req, res, next) => {
       throw error;
     }
 
-    if (repo.owner.toString() !== req.user._id.toString()) {
-      const error = new Error('Only the owner can delete files');
-      error.statusCode = 403;
-      throw error;
-    }
 
-    const file = await File.findOne({ _id: fileId, repository: repoId });
+
+    const file = await File.findOne({ _id: fileId, repository: repoId, branch });
     if (!file) {
       const error = new Error('File not found');
       error.statusCode = 404;
@@ -201,6 +205,7 @@ export const deleteFile = async (req, res, next) => {
       authorId: req.user._id,
       repoId,
       files: [{ file: file._id, action: 'deleted', filePath: file.path }],
+      branch,
     });
 
     await File.findByIdAndDelete(fileId);
@@ -222,6 +227,7 @@ export const deleteFile = async (req, res, next) => {
 export const getFileContent = async (req, res, next) => {
   try {
     const { repoId, fileId } = req.params;
+    const branch = req.query.branch || 'main';
 
     const repo = await Repository.findById(repoId).lean();
     if (!repo) {
@@ -237,7 +243,7 @@ export const getFileContent = async (req, res, next) => {
       throw error;
     }
 
-    const file = await File.findOne({ _id: fileId, repository: repoId })
+    const file = await File.findOne({ _id: fileId, repository: repoId, branch })
       .populate('lastCommit', 'shortHash message createdAt')
       .lean();
 
@@ -272,6 +278,7 @@ export const getFileContent = async (req, res, next) => {
 export const getFileTree = async (req, res, next) => {
   try {
     const { repoId } = req.params;
+    const branch = req.query.branch || 'main';
 
     const repo = await Repository.findById(repoId).lean();
     if (!repo) {
@@ -286,6 +293,8 @@ export const getFileTree = async (req, res, next) => {
       throw error;
     }
 
+    const files = await File.find({ repository: repoId, branch })
+      .select('name path size mimeType isDirectory')
     const files = await File.find({ repository: repoId })
       .select('name path size mimeType isDirectory version lastModified lastCommit')
       .populate({
@@ -318,7 +327,7 @@ export const getFileTree = async (req, res, next) => {
 export const uploadBulkFiles = async (req, res, next) => {
   try {
     const { repoId } = req.params;
-    const { files } = req.body; // Array of { path, content }
+    const { files, branch = 'main' } = req.body; // Array of { path, content }
 
     if (!files || !Array.isArray(files) || files.length === 0) {
       const error = new Error('No files provided');
@@ -333,63 +342,88 @@ export const uploadBulkFiles = async (req, res, next) => {
       throw error;
     }
 
-    if (repo.owner.toString() !== req.user._id.toString()) {
-      const error = new Error('Only the owner can add files');
-      error.statusCode = 403;
-      throw error;
-    }
+
 
     const existing = await File.find({ 
       repository: repoId, 
+      branch,
       path: { $in: files.map(f => f.path) } 
-    }).lean();
+    });
     
-    const existingPaths = new Set(existing.map(e => e.path));
-    const filesToCreate = files.filter(f => !existingPaths.has(f.path));
-
-    if (filesToCreate.length === 0) {
-      return res.status(200).json({ success: true, message: 'All files already exist.', files: [] });
-    }
+    const existingMap = new Map();
+    existing.forEach(e => existingMap.set(e.path, e));
 
     const createdFiles = [];
+    const modifiedFiles = [];
     const commitFilesData = [];
 
-    for (const fileData of filesToCreate) {
+    for (const fileData of files) {
       const { path: filePath, content } = fileData;
       const name = filePath.split('/').pop();
       const contentBuffer = Buffer.from(content || '', 'utf-8');
 
+      if (contentBuffer.length > 10 * 1024 * 1024) {
+        console.warn(`Skipping ${name}: file too large (max 10MB)`);
+        continue;
+      }
+
+      // Process Guardian Certificate
       const guardianResult = processFileBuffer(name, contentBuffer, repo, req.user);
 
-      const file = new File({
-        name,
-        path: filePath,
-        content: guardianResult.buffer,
-        repository: repoId,
-        size: guardianResult.buffer.length,
-        mimeType: getMimeType(name),
-        guardianProtected: guardianResult.certificateInserted,
-        fileCertificateId: guardianResult.fileCertificateId,
-        certificateInsertedAt: guardianResult.certificateInserted ? new Date() : undefined,
-      });
-
-      createdFiles.push(file);
-      commitFilesData.push({ file: file._id, action: 'added', filePath });
+      if (existingMap.has(filePath)) {
+        // Update existing file
+        const existingFile = existingMap.get(filePath);
+        existingFile.content = guardianResult.buffer;
+        existingFile.size = guardianResult.buffer.length;
+        if (guardianResult.certificateInserted) {
+          existingFile.guardianProtected = true;
+          existingFile.fileCertificateId = guardianResult.fileCertificateId;
+          existingFile.certificateInsertedAt = new Date();
+        }
+        modifiedFiles.push(existingFile);
+        commitFilesData.push({ file: existingFile._id, action: 'modified', filePath });
+      } else {
+        // Create new file
+        const file = new File({
+          name,
+          path: filePath,
+          content: guardianResult.buffer,
+          repository: repoId,
+          branch,
+          size: guardianResult.buffer.length,
+          mimeType: getMimeType(name),
+          guardianProtected: guardianResult.certificateInserted,
+          fileCertificateId: guardianResult.fileCertificateId,
+          certificateInsertedAt: guardianResult.certificateInserted ? new Date() : undefined,
+        });
+        createdFiles.push(file);
+        commitFilesData.push({ file: file._id, action: 'added', filePath });
+      }
     }
 
     // Create a commit for all files
     const commit = await createCommit({
-      message: `Upload folder with ${createdFiles.length} files`,
+      message: `Upload folder with ${files.length} files`,
       authorId: req.user._id,
       repoId,
       files: commitFilesData,
+      branch,
     });
 
     for (const file of createdFiles) {
       file.lastCommit = commit._id;
     }
+    for (const file of modifiedFiles) {
+      file.lastCommit = commit._id;
+    }
 
-    await File.insertMany(createdFiles);
+    if (createdFiles.length > 0) {
+      await File.insertMany(createdFiles);
+    }
+    
+    for (const file of modifiedFiles) {
+      await file.save();
+    }
 
     // Trigger CodeDNA generation for all new files
     createdFiles.forEach(f => queueFileDNA(f._id, false));
@@ -402,7 +436,7 @@ export const uploadBulkFiles = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: `Uploaded ${createdFiles.length} files successfully`,
+      message: `Uploaded ${files.length} files successfully`,
       commit: {
         _id: commit._id,
         shortHash: commit.shortHash,

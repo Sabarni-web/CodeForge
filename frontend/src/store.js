@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/auth/authSlice';
 import repoReducer from './features/repos/repoSlice';
 import fileReducer from './features/files/fileSlice';
+import branchReducer from './features/branches/branchSlice';
 import aiReducer from './features/ai/aiSlice';
 import uiReducer from './features/ui/uiSlice';
 import userReducer from './features/users/userSlice';
@@ -30,6 +31,7 @@ const store = configureStore({
     auth: authReducer,
     repos: repoReducer,
     files: fileReducer,
+    branches: branchReducer,
     ai: aiReducer,
     ui: uiReducer,
     users: userReducer,
