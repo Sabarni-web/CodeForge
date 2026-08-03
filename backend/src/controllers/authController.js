@@ -10,7 +10,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: parseInt(process.env.COOKIE_EXPIRE || '7', 10) * 24 * 60 * 60 * 1000,
   };
 
@@ -94,6 +94,8 @@ export const logout = async (req, res, next) => {
   try {
     res.cookie('token', '', {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       expires: new Date(0),
     });
 
