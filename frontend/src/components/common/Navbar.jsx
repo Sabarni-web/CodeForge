@@ -62,21 +62,34 @@ const Navbar = () => {
     setNotifDropdownOpen(false);
   }, [location.pathname]);
 
-  // Calculate indicator position
-  const getIndicatorStyle = useCallback(() => {
-    if (!linksRef.current) return { width: 0, transform: 'translateX(0px)' };
-    const links = linksRef.current.querySelectorAll('.cf-navbar__link');
-    let activeIdx = -1;
-    links.forEach((el, i) => {
-      if (el.classList.contains('is-active')) activeIdx = i;
-    });
-    if (activeIdx === -1) return { width: 0, transform: 'translateX(0px)', opacity: 0 };
+  const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, transform: 'translateX(0px)', opacity: 0 });
 
-    const activeLink = links[activeIdx];
-    const containerRect = linksRef.current.getBoundingClientRect();
-    const linkRect = activeLink.getBoundingClientRect();
-    const offset = linkRect.left - containerRect.left - 4; // 4px padding
-    return { width: `${linkRect.width}px`, transform: `translateX(${offset}px)`, opacity: 1 };
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (!linksRef.current) return;
+      const activeIdx = NAV_ITEMS.findIndex(item => isActive(item.path));
+      if (activeIdx === -1) {
+        setIndicatorStyle({ width: 0, transform: 'translateX(0px)', opacity: 0 });
+        return;
+      }
+      
+      // children[0] is the indicator, so children[activeIdx + 1] is the link
+      const activeLink = linksRef.current.children[activeIdx + 1];
+      if (!activeLink) return;
+
+      const containerRect = linksRef.current.getBoundingClientRect();
+      const linkRect = activeLink.getBoundingClientRect();
+      const offset = linkRect.left - containerRect.left - 4; // 4px padding
+      setIndicatorStyle({ width: `${linkRect.width}px`, transform: `translateX(${offset}px)`, opacity: 1 });
+    };
+
+    // Use a small timeout to ensure DOM is fully updated with the active classes
+    const timer = setTimeout(updateIndicator, 10);
+    window.addEventListener('resize', updateIndicator);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateIndicator);
+    };
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -125,7 +138,7 @@ const Navbar = () => {
         {/* Center nav links (authenticated only) */}
         {isAuthenticated && (
           <div className="cf-navbar__links" ref={linksRef}>
-            <div className="cf-navbar__indicator" style={getIndicatorStyle()} />
+            <div className="cf-navbar__indicator" style={indicatorStyle} />
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.path}
