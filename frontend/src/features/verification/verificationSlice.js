@@ -1,19 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../api/axiosConfig.js';
 
 export const verifyCode = createAsyncThunk(
   'verification/verifyCode',
   async ({ files, targetRepoId }, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/guardian/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ files, targetRepoId })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Verification failed');
-      }
-      return data;
+      const response = await api.post('/guardian/verify', { files, targetRepoId });
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
     }

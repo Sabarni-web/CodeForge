@@ -1,17 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../api/axiosConfig.js';
 
 export const fetchDashboard = createAsyncThunk(
   'guardianDashboard/fetchDashboard',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/guardian/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      if (!response.ok) return rejectWithValue(data.message);
-      return data.data;
+      const response = await api.get('/guardian/dashboard');
+      return response.data.data;
     } catch (err) {
       return rejectWithValue(err.message);
     }

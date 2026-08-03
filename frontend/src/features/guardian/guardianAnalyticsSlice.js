@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../api/axiosConfig.js';
 
 export const fetchAnalytics = createAsyncThunk(
   'guardianAnalytics/fetchAnalytics',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/guardian/analytics');
-      const data = await response.json();
-      if (!response.ok) return rejectWithValue(data.message);
-      return data.analytics;
+      const response = await api.get('/guardian/analytics');
+      return response.data.analytics;
     } catch (err) {
       return rejectWithValue(err.message);
     }
