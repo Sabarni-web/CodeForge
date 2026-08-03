@@ -6,7 +6,14 @@ const userSockets = new Map(); // userId -> Set of socketIds
 export const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: function (origin, callback) {
+        const allowedOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : ['http://localhost:5173'];
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('vercel.app')) {
+          callback(null, true);
+        } else {
+          callback(null, origin);
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST'],
     },
