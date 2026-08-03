@@ -24,7 +24,11 @@ const useSocket = () => {
     }
 
     // Connect to server (using relative path for proxied setup, or root URL)
-    socketRef.current = io(window.location.origin || 'http://localhost:5000', {
+    const socketUrl = import.meta.env.VITE_API_URL 
+      ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') 
+      : window.location.origin;
+
+    socketRef.current = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling'],
     });
