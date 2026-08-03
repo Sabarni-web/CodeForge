@@ -1,17 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+import api from '../../api/axiosConfig';
+
 export const fetchVerificationReport = createAsyncThunk(
   'guardianReport/fetchReport',
   async (reportId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`/api/guardian/report/${reportId}`);
-      const data = await response.json();
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to fetch report');
-      }
-      return data.report;
+      const response = await api.get(`/guardian/report/${reportId}`);
+      return response.data.report;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
