@@ -488,6 +488,7 @@ const RepoDetailPage = () => {
                   </div>
                 </div>
 
+
                 <div 
                   className="px-4 py-2 hover:bg-dark-800 cursor-pointer flex items-start gap-3"
                   onClick={() => { setWatchOption('All Activity'); setWatchDropdownOpen(false); }}
