@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheckIcon, XCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { FiSearch } from 'react-icons/fi';
 import Loader from '../components/common/Loader';
+import api from '../api/axiosConfig';
 
 const PublicVerificationPage = () => {
   // Force HMR to clear browser cache
@@ -18,12 +19,10 @@ const PublicVerificationPage = () => {
     setResult(null);
 
     try {
-      const response = await fetch(`/api/guardian/certificate/${certId.trim()}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Invalid certificate');
-      setResult(data.data);
+      const response = await api.get(`/guardian/certificate/${certId.trim()}`);
+      setResult(response.data.data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Verification failed');
     } finally {
       setLoading(false);
     }
